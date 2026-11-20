@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DJATI Restu Admin Dashboard</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+<style>
+/* ===================== TOKEN ===================== */
+:root{
+    --ink:#0f1a2b;
+    --ink-2:#17253b;
+    --line:#e5e8ee;
+    --bg:#f3f5f8;
+    --card:#fff;
+    --text:#1c2738;
+    --muted:#6b778a;
+    --gold:#b8924f;
+    --gold-soft:#f6efe2;
+    --blue:#2f6fed;
+    --green:#16a36a;
+    --orange:#e8892b;
+    --pink:#d9467f;
+    --red:#dc3d3d;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(15,26,43,.05),0 8px 24px rgba(15,26,43,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Poppins",system-ui,sans-serif;font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+button{cursor:pointer}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1{font-size:1.5rem;font-weight:600;letter-spacing:-.01em}
+h2{font-size:1.1rem;font-weight:600}
+p{color:var(--muted)}
+
+/* ===================== LOADING ===================== */
+.loading{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--ink);transition:opacity .45s,visibility .45s}
+.loading.hide,.loading.hidden,.loading.done,.loading.loaded,.loading.fade-out{opacity:0;visibility:hidden;pointer-events:none}
+.loader{width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--gold);animation:spin .9s linear infinite}
+.loading-text{color:#c9d2e0;letter-spacing:.06em;font-size:.9rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===================== LAYOUT ===================== */
+.wrapper{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;margin-left:260px;display:flex;flex-direction:column}
+.content{padding:30px;max-width:1360px;width:100%}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;z-index:900;background:linear-gradient(180deg,var(--ink),var(--ink-2));color:#c7d0de;padding:22px 16px;overflow-y:auto;transition:transform .3s ease}
+.logo{display:flex;align-items:center;gap:12px;padding:6px 10px 26px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo i{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--gold);color:var(--ink);font-size:1rem}
+.logo h2{color:#fff;font-size:1.15rem;letter-spacing:.02em}
+.menu{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:4px}
+.menu li{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;cursor:pointer;position:relative;transition:background .2s,color .2s}
+.menu li i{width:20px;text-align:center;font-size:1rem;opacity:.8}
+.menu li:hover{background:rgba(255,255,255,.06);color:#fff}
+.menu li.active{background:rgba(184,146,79,.16);color:#fff}
+.menu li.active i{color:var(--gold);opacity:1}
+.menu li.active::before{content:"";position:absolute;left:-16px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--gold)}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(10,16,28,.55);backdrop-filter:blur(2px)}
+
+/* ===================== TOPBAR ===================== */
+.topbar{position:sticky;top:0;z-index:700;display:flex;align-items:center;gap:16px;height:68px;padding:0 30px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+#menuBtn{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text)}
+.topbar .title{font-size:1.1rem;font-weight:600;flex:1}
+.admin{display:flex;align-items:center;gap:10px;padding:7px 16px 7px 8px;border:1px solid var(--line);border-radius:50px;background:#fff;color:var(--muted);font-size:.85rem}
+.admin i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--gold-soft);color:var(--gold)}
+
+/* ===================== PAGES ===================== */
+.page{display:none;animation:pageIn .35s ease}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page>h1+p{margin:6px 0 26px}
+.page>h1{margin-bottom:20px}
+.page>h1:first-child:not(:only-child){margin-bottom:6px}
+.page-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.page-header h1{margin:0}
+
+/* ===================== CARDS ===================== */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:34px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.cards .card{position:relative;overflow:hidden}
+.cards .card h2{font-size:2rem;font-weight:700;line-height:1.1;margin-top:18px}
+.cards .card p{margin-top:2px}
+.icon{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;font-size:1.15rem}
+.icon.blue{background:#e8effd;color:var(--blue)}
+.icon.green{background:#e3f6ee;color:var(--green)}
+.icon.orange{background:#fcefdf;color:var(--orange)}
+.icon.pink{background:#fbe6ef;color:var(--pink)}
+
+.quick h2{margin-bottom:16px}
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.quick-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 12px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.quick-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow)}
+.quick-card>i,.quick-icon i{font-size:1.5rem;color:var(--gold)}
+.quick-icon{display:grid;place-items:center;line-height:1}
+.quick-card span{font-weight:500;font-size:.9rem}
+
+/* ===================== FORM & BUTTON ===================== */
+.form-group{display:flex;flex-direction:column;gap:8px;margin:18px 0 22px}
+.form-group label{font-weight:500;font-size:.85rem}
+input[type=text],.form-group input{width:100%;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);transition:border-color .2s,box-shadow .2s}
+input[type=text]:focus,.form-group input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(184,146,79,.16)}
+#addPage .card{max-width:520px}
+.add-btn,.add-guest-btn,.primary-btn,.choose-btn,.refresh-btn,.danger-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 20px;border:1px solid transparent;border-radius:10px;font-weight:500;transition:transform .15s,background .2s,box-shadow .2s}
+.add-btn,.add-guest-btn,.primary-btn,.choose-btn{background:var(--ink);color:#fff}
+.add-btn:hover,.add-guest-btn:hover,.primary-btn:hover,.choose-btn:hover{background:var(--ink-2);transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,26,43,.22)}
+.add-guest-btn{width:100%}
+.refresh-btn{background:#fff;border-color:var(--line);color:var(--text)}
+.refresh-btn:hover{border-color:var(--gold);color:var(--gold)}
+.danger-btn{background:#fff;border-color:#f1c4c4;color:var(--red)}
+.danger-btn:hover{background:var(--red);color:#fff}
+button:disabled{opacity:.55;cursor:not-allowed}
+
+/* ===================== DATA TAMU ===================== */
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.search-box{position:relative;flex:1;min-width:240px}
+.search-box i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search-box input{padding-left:44px}
+.table-wrapper{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto}
+.guest-table{width:100%;border-collapse:collapse;min-width:820px}
+.guest-table th{padding:14px 18px;text-align:left;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#fafbfc;border-bottom:1px solid var(--line)}
+.guest-table td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:middle;word-break:break-word}
+.guest-table tbody tr{transition:background .15s}
+.guest-table tbody tr:hover{background:#fafbfd}
+.guest-table tbody tr:last-child td{border-bottom:none}
+.guest-table td[colspan]{text-align:center;color:var(--muted);padding:40px}
+.guest-table img{width:48px;height:48px;border-radius:8px;border:1px solid var(--line);padding:3px;background:#fff;cursor:pointer}
+.guest-table a{color:var(--blue)}
+/* tombol & badge hasil render JS */
+.guest-table td button,.guest-table td .btn,.guest-table td .action-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:34px;height:34px;padding:0 12px;margin:2px 3px 2px 0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-size:.8rem;transition:background .2s,color .2s,border-color .2s}
+.guest-table td button:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+.guest-table td button[class*="delete"],.guest-table td button[class*="hapus"],.guest-table td button[class*="danger"]{color:var(--red);border-color:#f1c4c4}
+.guest-table td button[class*="delete"]:hover,.guest-table td button[class*="hapus"]:hover,.guest-table td button[class*="danger"]:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.badge,.status,[class*="status-"],.guest-table td span[class*="present"],.guest-table td span[class*="absent"]{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.75rem;font-weight:500;background:#eef1f5;color:var(--muted)}
+.badge.success,.badge.present,.status.present,.status-present,.present,.hadir,.success{background:#e3f6ee;color:var(--green)}
+.badge.warning,.badge.absent,.status.absent,.status-absent,.absent,.belum,.pending{background:#fcefdf;color:var(--orange)}
+.badge.danger,.danger{background:#fbe3e3;color:var(--red)}
+
+/* ===================== CARI TAMU ===================== */
+.search-card{max-width:760px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px}
+.search-header{margin-bottom:20px}
+.search-header p{margin-top:2px}
+#guestSearchList,#commentList{display:flex;flex-direction:column;gap:12px}
+#guestSearchList{margin-top:20px}
+.placeholder{padding:36px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;background:#fafbfc}
+#guestSearchList>div:not(.placeholder){display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:#fff;transition:border-color .2s,box-shadow .2s}
+#guestSearchList>div:not(.placeholder):hover{border-color:var(--gold);box-shadow:var(--shadow)}
+#guestSearchList button{padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
+#guestSearchList button:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ===================== IMPORT EXCEL ===================== */
+.import-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:44px 20px;text-align:center;background:var(--card);border:2px dashed #cfd6e2;border-radius:var(--radius);cursor:pointer;transition:border-color .2s,background .2s}
+.import-box:hover,.import-box.dragover,.import-box.drag,.import-box.active{border-color:var(--gold);background:var(--gold-soft)}
+.import-icon{font-size:2.8rem;color:var(--green);margin-bottom:8px}
+.choose-btn{margin-top:14px}
+.selected-file{margin-top:14px;padding:6px 16px;border-radius:50px;background:#f1f3f7;color:var(--muted);font-size:.85rem}
+.import-action{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.import-progress{margin-bottom:20px}
+.progress-bar{width:100%;height:10px;border-radius:10px;background:#e8ebf0;overflow:hidden}
+#progressFill,.progress-fill{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--gold),#d8b672);transition:width .3s ease}
+.import-progress #progressText{margin-top:8px;text-align:right;font-weight:500;color:var(--text)}
+#importSummary{margin-bottom:16px;color:var(--text)}
+#importSummary:empty{display:none}
+#importPreview{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;overflow-x:auto;box-shadow:var(--shadow)}
+#importPreview table{width:100%;border-collapse:collapse;min-width:480px}
+#importPreview th{padding:12px 14px;text-align:left;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#fafbfc;border-bottom:1px solid var(--line)}
+#importPreview td{padding:11px 14px;border-bottom:1px solid var(--line)}
+
+/* ===================== RSVP ===================== */
+.page-header #searchComment{width:100%;max-width:340px}
+#commentList>div:not(.placeholder){padding:18px 22px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;box-shadow:var(--shadow);word-break:break-word}
+#commentList h3,#commentList strong,#commentList b{display:block;font-size:1rem;font-weight:600;color:var(--text);margin-bottom:4px}
+#commentList p{color:var(--text);margin-top:4px}
+#commentList small,#commentList time{display:block;margin-top:8px;color:var(--muted);font-size:.78rem}
+
+/* ===================== EXPORT ===================== */
+.export-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.export-card{padding:28px 22px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.export-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:var(--shadow)}
+.export-card i{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 14px;border-radius:14px;background:var(--gold-soft);color:var(--gold);font-size:1.5rem}
+.export-card h3{font-size:1rem;font-weight:600}
+.export-card p{margin-top:2px;font-size:.85rem}
+
+/* ===================== MODAL (konfirmasi, QR, detail, progres) ===================== */
+.confirm-modal,.qrtoast,.guest-modal,.export-progress{display:none;position:fixed;inset:0;z-index:3000;align-items:center;justify-content:center;padding:20px;background:rgba(10,16,28,.6);backdrop-filter:blur(3px)}
+.confirm-modal.active,.confirm-modal.show,.confirm-modal.open,
+.qrtoast.active,.qrtoast.show,.qrtoast.open,
+.guest-modal.active,.guest-modal.show,.guest-modal.open,
+.export-progress.active,.export-progress.show,.export-progress.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.confirm-card,.qrtoast-box,.guest-modal-content,.progress-window{position:relative;width:100%;background:#fff;border-radius:18px;padding:30px;text-align:center;box-shadow:0 30px 60px rgba(10,16,28,.35);animation:popIn .28s ease}
+@keyframes popIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.confirm-card{max-width:400px}
+#confirmIcon{font-size:2.6rem;line-height:1;margin-bottom:12px;color:var(--red)}
+.confirm-card h2{margin-bottom:6px}
+.confirm-card .guest-box{margin:18px 0;padding:12px 16px;border-radius:10px;background:var(--gold-soft);color:var(--text);word-break:break-word}
+.confirm-buttons{display:flex;gap:10px}
+.confirm-buttons button{flex:1;padding:12px;border-radius:10px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--text)}
+.confirm-buttons button:hover{background:#f3f5f8}
+#btnConfirm{background:var(--red);border-color:var(--red);color:#fff}
+#btnConfirm:hover{background:#c23030}
+
+.qrtoast-box{max-width:360px}
+.qrtoast-box h3{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;font-size:1.05rem}
+.qrtoast-box h3 i{color:var(--gold)}
+#previewQR,.detail-qr{display:block;width:210px;height:210px;object-fit:contain;margin:0 auto 14px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff}
+#previewGuest{font-weight:600;color:var(--text);margin-bottom:18px;word-break:break-word}
+.qr-close-icon,#closeGuestModal{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:34px;height:34px;border:none;border-radius:50%;background:#f1f3f7;color:var(--muted);transition:background .2s,color .2s}
+.qr-close-icon:hover,#closeGuestModal:hover{background:var(--red);color:#fff}
+.qr-close-btn{width:100%;padding:12px;border:none;border-radius:10px;background:var(--ink);color:#fff;font-weight:500}
+.qr-close-btn:hover{background:var(--ink-2)}
+
+.guest-modal-content{max-width:420px}
+.guest-modal-content h2{margin:4px 30px 18px;word-break:break-word}
+.guest-modal-content input{margin-bottom:16px;text-align:center;color:var(--muted);background:#fafbfc}
+.detail-buttons{display:flex;gap:10px}
+.detail-buttons button{flex:1;padding:12px;border-radius:10px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--text)}
+.detail-buttons button:hover{border-color:var(--gold);color:var(--gold)}
+#openGuestBtn{background:var(--ink);border-color:var(--ink);color:#fff}
+#openGuestBtn:hover{background:var(--ink-2);color:#fff}
+
+.progress-window{max-width:420px}
+.progress-icon{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 14px;border-radius:16px;background:var(--gold-soft);color:var(--gold);font-size:1.6rem}
+.progress-window h2{margin-bottom:4px}
+.progress-window #progressText{margin-bottom:18px}
+.progress-percent{margin-top:12px;font-size:1.6rem;font-weight:700}
+.progress-guest{margin-top:2px;color:var(--muted);font-size:.85rem;word-break:break-word}
+.progress-count{margin-top:8px;display:inline-block;padding:4px 14px;border-radius:50px;background:#f1f3f7;color:var(--muted);font-size:.8rem}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:992px){
+    .main{margin-left:0}
+    #menuBtn{display:grid;place-items:center}
+    .sidebar{transform:translateX(-100%);box-shadow:none}
+    .sidebar.active,.sidebar.show,.sidebar.open{transform:none;box-shadow:20px 0 50px rgba(10,16,28,.35)}
+    .sidebar-overlay.active,.sidebar-overlay.show,.sidebar-overlay.open{display:block}
+    .content{padding:22px 18px}
+    .topbar{padding:0 18px}
+}
+@media(max-width:560px){
+    .cards{gap:12px}
+    .card{padding:18px}
+    .cards .card h2{font-size:1.6rem}
+    .admin{font-size:0;gap:0;padding:4px}
+    .page-header{flex-direction:column;align-items:stretch}
+    .page-header #searchComment{max-width:none}
+    .confirm-buttons,.detail-buttons{flex-direction:column}
+    .search-card{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= Loading ================= -->
+
+<div class="loading" id="loading">
+
+    <div class="loader"></div>
+
+    <p class="loading-text">Memuat Dashboard...</p>
+
+</div>
+
+<!-- ================= Wrapper ================= -->
+
+<div class="wrapper">
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- ================= Sidebar ================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+
+        <i class="fa-solid fa-heart"></i>
+
+        <h2>DJATI Restu</h2>
+
+    </div>
+
+    <ul class="menu">
+
+        <li class="active" data-page="dashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </li>
+
+        <li data-link="scanner.html">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>Scanner QR</span>
+        </li>
+
+        <li data-page="guest">
+            <i class="fa-solid fa-users"></i>
+            <span>Data Tamu</span>
+        </li>
+
+        <li data-page="add">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Tambah Tamu</span>
+        </li>
+
+        <li data-page="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Cari Tamu</span>
+        </li>
+
+        <li data-page="import">
+            <i class="fa-solid fa-file-import"></i>
+            <span>Import Excel</span>
+        </li>
+
+        <li data-page="rsvp">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>RSVP</span>
+        </li>
+
+        <li data-page="export">
+            <i class="fa-solid fa-download"></i>
+            <span>Export</span>
+        </li>
+
+    </ul>
+
+</aside>
+
+<!-- ================= Main ================= -->
+
+<main class="main">
+
+<!-- ================= Header ================= -->
+
+<header class="topbar">
+
+    <button id="menuBtn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="title">Dashboard</div>
+
+    <div class="admin">
+        <i class="fa-solid fa-user"></i>
+        by DJATI Group
+    </div>
+
+</header>
+
+<!-- ================= Content ================= -->
+
+<div class="content">
+
+<!-- ===================================================== -->
+<!-- Dashboard -->
+<!-- ===================================================== -->
+
+<section id="dashboardPage" class="page active">
+
+<h1>Selamat Datang 👋</h1>
+
+<p>Kelola seluruh tamu, RSVP, QR Code dan Check In melalui dashboard admin.</p>
+
+<!-- ================= Cards ================= -->
+
+<div class="cards">
+
+    <div class="card">
+        <div class="icon blue"><i class="fa-solid fa-users"></i></div>
+        <h2 id="totalGuest">0</h2>
+        <p>Total Tamu</p>
+    </div>
+
+    <div class="card">
+        <div class="icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <h2 id="totalPresent">0</h2>
+        <p>Sudah Hadir</p>
+    </div>
+
+    <div class="card">
+        <div class="icon orange"><i class="fa-solid fa-clock"></i></div>
+        <h2 id="totalAbsent">0</h2>
+        <p>Belum Hadir</p>
+    </div>
+
+    <div class="card">
+        <div class="icon pink"><i class="fa-solid fa-calendar-days"></i></div>
+        <h2 id="totalRSVP">0</h2>
+        <p>RSVP</p>
+    </div>
+
+</div>
+
+<!-- ================= Quick Action ================= -->
+
+<div class="quick">
+
+    <h2>Quick Action</h2>
+
+    <div class="quick-grid">
+
+        <div class="quick-card" data-link="scanner.html">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>Scanner QR</span>
+        </div>
+
+        <div class="quick-card" data-page="guest">
+            <i class="fa-solid fa-users"></i>
+            <span>Data Tamu</span>
+        </div>
+
+        <div class="quick-card" data-page="add">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Tambah Tamu</span>
+        </div>
+
+        <div class="quick-card" data-page="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Cari Tamu</span>
+        </div>
+
+        <div class="quick-card" data-page="import">
+            <div class="quick-icon">
+                <i class="fa-solid fa-file-excel"></i>
+            </div>
+            <span>Import Excel</span>
+        </div>
+
+        <div class="quick-card" data-page="rsvp">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>RSVP</span>
+        </div>
+
+        <div class="quick-card" data-page="export">
+            <i class="fa-solid fa-download"></i>
+            <span>Export</span>
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- DATA TAMU -->
+<!-- ===================================================== -->
+
+<section id="guestPage" class="page">
+
+    <div class="page-header">
+
+        <h1>Data Tamu</h1>
+
+        <button class="add-btn">
+            <i class="fa-solid fa-user-plus"></i>
+            Tambah Tamu
+        </button>
+
+    </div>
+
+    <div class="toolbar">
+
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                id="searchGuest"
+                placeholder="Cari nama, link atau QR Code...">
+
+        </div>
+
+        <button id="refreshGuest" class="refresh-btn">
+            <i class="fa-solid fa-rotate-right"></i>
+            Refresh
+        </button>
+
+    </div>
+
+    <div class="table-wrapper">
+
+        <table class="guest-table">
+
+            <thead>
+
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Link</th>
+                    <th>QR Code</th>
+                    <th>Status</th>
+                    <th>Check In</th>
+                    <th width="220">Aksi</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="guestTable">
+
+                <tr>
+                    <td colspan="7">Memuat data tamu...</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- TAMBAH TAMU -->
+<!-- ===================================================== -->
+
+<section id="addPage" class="page">
+
+    <div class="card">
+
+        <h2>Tambah Tamu</h2>
+
+        <div class="form-group">
+
+            <label>Nama Tamu</label>
+
+            <input
+                type="text"
+                id="guestName"
+                placeholder="Masukkan nama tamu">
+
+        </div>
+
+        <button id="btnAddGuest" class="add-guest-btn">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Tambah Tamu</span>
+        </button>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- SEARCH -->
+<!-- ===================================================== -->
+
+<section id="searchPage" class="page">
+
+    <div class="search-card">
+
+        <div class="search-header">
+            <h2>Cari Tamu</h2>
+            <p>Cari nama tamu.</p>
+        </div>
+
+        <div class="search-box">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                id="searchGuestInput"
+                type="text"
+                placeholder="Cari nama tamu..."
+                autocomplete="off">
+
+        </div>
+
+        <!-- Hasil pencarian -->
+        <div id="guestSearchList">
+
+            <div class="placeholder">
+                Mulai mengetik nama tamu...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- IMPORT EXCEL -->
+<!-- ===================================================== -->
+
+<section id="importPage" class="page">
+
+    <h1>Import Daftar Tamu</h1>
+
+    <div class="import-box" id="dropArea">
+
+        <i class="fa-solid fa-file-excel import-icon"></i>
+
+        <h2>Drag & Drop File Excel</h2>
+
+        <p>atau klik area ini untuk memilih file</p>
+
+        <input
+            type="file"
+            id="excelFile"
+            accept=".xlsx,.xls"
+            hidden>
+
+        <button id="btnChooseExcel" class="choose-btn">
+            <i class="fa-solid fa-folder-open"></i>
+            Pilih File Excel
+        </button>
+
+        <div id="selectedFile" class="selected-file">
+            Belum ada file dipilih
+        </div>
+
+    </div>
+
+    <div class="import-action">
+
+        <button id="btnPreview" class="primary-btn">
+            <i class="fa-solid fa-eye"></i>
+            Preview Excel
+        </button>
+
+        <button id="btnResetImport" class="danger-btn">
+            <i class="fa-solid fa-trash"></i>
+            Reset File
+        </button>
+
+    </div>
+
+    <div
+        id="importProgress"
+        class="import-progress"
+        style="display:none">
+
+        <div class="progress-bar">
+            <div id="progressFill"></div>
+        </div>
+
+        <div id="progressText">0%</div>
+
+    </div>
+
+    <div id="importSummary"></div>
+
+    <div id="importPreview">
+
+        <div class="placeholder">
+            Silakan pilih file Excel.
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- RSVP -->
+<!-- ===================================================== -->
+
+<section id="rsvpPage" class="page">
+
+    <div class="page-header">
+
+        <h1>RSVP & Ucapan Tamu</h1>
+
+        <input
+            type="text"
+            id="searchComment"
+            placeholder="🔍 Cari nama atau isi ucapan..."
+            autocomplete="off">
+
+    </div>
+
+    <div id="commentList">
+
+        <div class="placeholder">
+            Memuat data RSVP...
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- EXPORT -->
+<!-- ===================================================== -->
+
+<section id="exportPage" class="page">
+
+    <h1>Export Center</h1>
+
+    <div class="export-grid">
+
+        <div class="export-card" id="btnOpenSheet">
+            <i class="fa-solid fa-table"></i>
+            <h3>Google Spreadsheet</h3>
+            <p>Database utama</p>
+        </div>
+
+        <div class="export-card" id="btnGuestExcel">
+            <i class="fa-solid fa-file-excel"></i>
+            <h3>Guest Excel</h3>
+            <p>Download Data Tamu</p>
+        </div>
+
+        <div class="export-card" id="btnRSVPExcel">
+            <i class="fa-solid fa-file-excel"></i>
+            <h3>RSVP Excel</h3>
+            <p>Download Data RSVP</p>
+        </div>
+
+        <div class="export-card" id="btnPDFReport">
+            <i class="fa-solid fa-file-pdf"></i>
+            <h3>PDF Report</h3>
+            <p>Download Laporan PDF</p>
+        </div>
+
+        <div class="export-card" id="btnExportQR">
+            <i class="fa-solid fa-file-zipper"></i>
+            <h3>QR ZIP</h3>
+            <p>Download QR Code Guest</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- MODAL KONFIRMASI -->
+<!-- ===================================================== -->
+
+<div id="confirmModal" class="confirm-modal">
+
+    <div class="confirm-card">
+
+        <div id="confirmIcon"></div>
+
+        <h2 id="confirmTitle"></h2>
+
+        <p id="confirmSubtitle"></p>
+
+        <div class="guest-box">
+            <strong id="confirmGuest"></strong>
+        </div>
+
+        <div class="confirm-buttons">
+
+            <button id="btnCancel">Batal</button>
+
+            <button id="btnConfirm">Hapus</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div> <!-- content -->
+
+</main>
+
+</div>
+
+<!-- Excel -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+
+<!-- Save File -->
+<script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/import.js"></script>
+<script src="js/export.js"></script>
+
+<div id="qrToast" class="qrtoast">
+
+    <div class="qrtoast-box">
+
+        <button class="qr-close-icon" onclick="closeQRToast()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3>
+            <i class="fa-solid fa-qrcode"></i>
+            Preview QR Code
+        </h3>
+
+        <img id="previewQR">
+
+        <p id="previewGuest"></p>
+
+        <button class="qr-close-btn" onclick="closeQRToast()">
+            Tutup
+        </button>
+
+    </div>
+
+</div>
+
+<div id="guestDetailModal" class="guest-modal">
+
+    <div class="guest-modal-content">
+
+        <button id="closeGuestModal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h2 id="detailGuestName"></h2>
+
+        <img id="detailGuestQR" class="detail-qr">
+
+        <input id="detailGuestLink" readonly>
+
+        <div class="detail-buttons">
+
+            <button id="copyGuestLinkBtn">Copy Link</button>
+
+            <button id="openGuestBtn">Buka Undangan</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="exportProgress" class="export-progress">
+
+    <div class="progress-window">
+
+        <div class="progress-icon">
+            <i class="fa-solid fa-file-zipper"></i>
+        </div>
+
+        <h2>Export QR Code</h2>
+
+        <p id="progressText">Menyiapkan...</p>
+
+        <div class="progress-bar">
+
+            <div id="progressFill" class="progress-fill"></div>
+
+        </div>
+
+        <div id="progressPercent" class="progress-percent">0%</div>
+
+        <div id="progressGuest" class="progress-guest">-</div>
+
+        <div id="progressCount" class="progress-count">0 / 0</div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
