@@ -2,30 +2,289 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Invitation | Rey Mboyong, S.H & Dinda Hai, S.Gz</title>
+<meta name="description" content="Undangan Pernikahan Rey Mboyong, S.H & Dinda Hai, S.Gz">
+<meta name="theme-color" content="#14261f">
 
-    <title>Wedding Invitation | Rey Mboyong, S.H & Dinda Hai, S.Gz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<!-- Font Awesome (dipakai oleh ikon E-Ticket, Google Calendar, dll) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <meta name="description"
-        content="Undangan Pernikahan Rey Mboyong, S.H & Dinda Hai, S.Gz">
+<style>
+/* =========================================================
+   TOKEN
+========================================================= */
+:root{
+    --night:#14261f;
+    --moss:#1f3a2e;
+    --moss-2:#2b4d3d;
+    --gold:#c9a15b;
+    --gold-soft:#e6cf9f;
+    --blush:#e8c9c1;
+    --mist:#f1f4ef;
+    --paper:#fbfcfa;
+    --ink:#22302a;
+    --muted:#667568;
+    --serif:"Cormorant Garamond",Georgia,serif;
+    --script:"Great Vibes",cursive;
+    --sans:"Jost",system-ui,sans-serif;
+    --arab:"Amiri","Traditional Arabic",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);font-weight:300;color:var(--ink);background:var(--night);line-height:1.8;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
-    <meta name="theme-color" content="#b58b5a">
+/* =========================================================
+   REVEAL (.fade-up)
+========================================================= */
+.fade-up{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease}
+.fade-up.visible{opacity:1;transform:none}
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+/* =========================================================
+   ORNAMEN UMUM
+========================================================= */
+.divider{width:140px;height:1px;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);position:relative}
+.divider::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg);outline:5px solid var(--night)}
+.inv-container{width:100%;max-width:760px;margin:0 auto;padding:0 26px;text-align:center}
+.inv-section-title{font-family:var(--script);font-size:clamp(2.4rem,8vw,3.4rem);line-height:1.2;color:var(--gold)}
+.inv-text{font-family:var(--serif);font-size:1.2rem;max-width:560px;margin:0 auto;color:inherit}
+.inv-title{font-family:var(--script);font-weight:400;font-size:clamp(2.8rem,10vw,4.4rem);line-height:1.25;color:var(--gold-soft)}
+.inv-and{font-family:var(--serif);font-style:italic;font-size:2rem;color:var(--gold);margin:2px 0}
+.inv-subtitle,.subtitle{font-family:var(--sans);letter-spacing:.38em;text-transform:uppercase;font-size:.78rem;color:var(--gold-soft)}
 
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+/* =========================================================
+   BACKGROUND + COVER
+========================================================= */
+.background{position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(circle at 15% 10%,rgba(201,161,91,.22),transparent 45%),
+    radial-gradient(circle at 90% 85%,rgba(232,201,193,.14),transparent 45%),
+    linear-gradient(160deg,#10201a,#1f3a2e 60%,#14261f)}
+.overlay{position:fixed;inset:0;z-index:-1;opacity:.5;background-image:
+    radial-gradient(rgba(230,207,159,.18) 1px,transparent 1px);background-size:28px 28px}
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/animation.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/premium.css">
-    <link rel="stylesheet" href="css/invitation-premium.css">
+.cover{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;
+    background:
+    radial-gradient(ellipse at top,rgba(201,161,91,.25),transparent 60%),
+    linear-gradient(170deg,#0e1c16,#1f3a2e 55%,#10201a);
+    transition:opacity .8s ease,transform .8s ease}
+.cover::before{content:"";position:absolute;inset:18px;border:1px solid rgba(201,161,91,.55);pointer-events:none}
+.cover::after{content:"";position:absolute;inset:26px;border:1px solid rgba(201,161,91,.2);pointer-events:none}
+.cover.hide{opacity:0;transform:scale(1.06);pointer-events:none}
+.cover-content{max-width:460px;width:100%}
+.cover .title{font-family:var(--script);font-weight:400;font-size:clamp(2.6rem,11vw,3.8rem);line-height:1.2;color:var(--gold-soft)}
+.cover .and{font-family:var(--serif);font-style:italic;font-size:1.8rem;color:var(--gold)}
+.cover .date{font-family:var(--serif);font-size:1.35rem;letter-spacing:.08em;color:var(--paper)}
+.guest-box{margin:26px auto 22px;padding:18px 20px;border:1px solid rgba(201,161,91,.5);background:rgba(255,255,255,.05);backdrop-filter:blur(4px);border-radius:120px 120px 6px 6px}
+.guest-box small{font-size:.8rem;letter-spacing:.12em;color:var(--gold-soft)}
+.guest-box h2{font-family:var(--serif);font-weight:600;font-size:1.7rem;color:#fff;margin-top:4px;word-break:break-word}
+.btn-open{cursor:pointer;font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:14px 34px;border-radius:50px;box-shadow:0 10px 26px rgba(0,0,0,.35);transition:transform .25s,box-shadow .25s}
+.btn-open:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(201,161,91,.4)}
+.cover .note{margin-top:22px;font-size:.78rem;color:rgba(255,255,255,.55)}
+/* animasi pembuka cover: satu rangkaian saja */
+.cover .fade-up{animation:coverIn 1s ease forwards;opacity:0}
+.cover .fade-up:nth-child(1){animation-delay:.15s}.cover .fade-up:nth-child(2){animation-delay:.35s}
+.cover .fade-up:nth-child(3){animation-delay:.5s}.cover .fade-up:nth-child(4){animation-delay:.65s}
+.cover .fade-up:nth-child(5){animation-delay:.8s}.cover .fade-up:nth-child(6){animation-delay:.95s}
+.cover .fade-up:nth-child(7){animation-delay:1.1s}.cover .fade-up:nth-child(8){animation-delay:1.25s}
+@keyframes coverIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 
+#invitationContent{display:none;opacity:0;transition:opacity 1s ease}
+#invitationContent.show{opacity:1}
+
+section{position:relative}
+section[class^="inv-"]{padding:90px 0}
+
+/* =========================================================
+   HERO
+========================================================= */
+.inv-hero{min-height:100vh;display:flex;align-items:center;color:var(--paper)}
+.inv-hero .inv-title{font-size:clamp(3rem,12vw,5.2rem)}
+.inv-desc{font-family:var(--serif);font-style:italic;font-size:1.35rem;color:var(--gold-soft);margin-bottom:12px}
+.inv-scroll{margin-top:46px}
+.inv-scroll span{display:block;width:1px;height:54px;margin:0 auto 8px;background:linear-gradient(var(--gold),transparent);animation:scrollLine 2s ease-in-out infinite}
+.inv-scroll p{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-soft)}
+@keyframes scrollLine{0%,100%{transform:scaleY(.4);transform-origin:top;opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* =========================================================
+   AYAT
+========================================================= */
+.inv-verse{background:var(--mist);color:var(--ink)}
+.inv-verse .divider::after{outline-color:var(--mist)}
+.inv-arab{font-family:var(--arab);font-weight:400;font-size:clamp(1.7rem,6vw,2.5rem);line-height:2.2;direction:rtl;color:var(--moss);margin-bottom:18px}
+.inv-latin{font-family:var(--serif);font-style:italic;color:var(--muted);margin-bottom:16px}
+.inv-translate{font-family:var(--serif);font-size:1.2rem;max-width:560px;margin:0 auto 14px}
+.inv-source{font-weight:500;letter-spacing:.18em;color:var(--gold)}
+.inv-verse .inv-section-title{color:var(--moss-2)}
+
+/* =========================================================
+   PREWEDDING HERO
+========================================================= */
+.inv-prewed{min-height:70vh;display:flex;align-items:center;color:var(--paper);background:
+    linear-gradient(rgba(20,38,31,.55),rgba(20,38,31,.82)),
+    radial-gradient(circle at 30% 30%,#2b4d3d,#10201a)}
+.inv-prewed-overlay{position:absolute;inset:0;background:url("images/prewed-hero.jpg") center/cover no-repeat;opacity:.45}
+.inv-prewed .inv-container{position:relative;z-index:1}
+.inv-prewed-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:clamp(2.4rem,8vw,4rem);margin:10px 0 18px;color:#fff}
+
+/* =========================================================
+   COUPLE
+========================================================= */
+.inv-couple{padding-bottom:30px!important;color:var(--paper)}
+.inv-groom,.inv-bride{padding:50px 0!important}
+.inv-profile{display:flex;flex-direction:column;align-items:center;gap:30px}
+.inv-photo-frame{width:min(300px,78vw);aspect-ratio:3/4;padding:10px;border:1px solid var(--gold);border-radius:150px 150px 10px 10px;position:relative;box-shadow:0 26px 50px rgba(0,0,0,.4)}
+.inv-photo-frame::before{content:"";position:absolute;inset:-14px;border:1px solid rgba(201,161,91,.3);border-radius:164px 164px 16px 16px;pointer-events:none}
+.inv-photo{width:100%;height:100%;object-fit:cover;border-radius:140px 140px 4px 4px;background:var(--moss-2)}
+.inv-profile-label{font-size:.78rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft)}
+.inv-profile-name{font-family:var(--script);font-weight:400;font-size:clamp(2.4rem,9vw,3.4rem);color:var(--gold-soft);line-height:1.3;margin-top:6px}
+.inv-profile-desc{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--paper);opacity:.85}
+.inv-parent{font-family:var(--serif);font-weight:600;font-size:1.3rem;color:#fff}
+@media(min-width:768px){
+    .inv-profile{flex-direction:row;text-align:left;gap:60px;justify-content:center}
+    .inv-profile-reverse{flex-direction:row-reverse}
+    .inv-profile-content .divider{margin-left:0}
+    .inv-container:has(.inv-profile){max-width:900px}
+}
+.inv-love{padding:40px 0!important;color:var(--paper)}
+.inv-love-icon{font-size:2.2rem;color:var(--blush);animation:beat 1.8s ease-in-out infinite}
+.inv-love-text{font-family:var(--serif);font-style:italic;font-size:1.3rem;color:var(--gold-soft);margin-top:10px}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+
+/* =========================================================
+   GALERI
+========================================================= */
+.inv-gallery-preview{color:var(--paper)}
+.inv-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
+.inv-gallery-item{overflow:hidden;border:1px solid rgba(201,161,91,.5);padding:6px;background:rgba(255,255,255,.04)}
+.inv-gallery-item img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/4;transition:transform .8s ease;background:var(--moss-2)}
+.inv-gallery-item:hover img{transform:scale(1.06)}
+.inv-gallery-item:first-child{grid-column:1/-1}
+.inv-gallery-item:first-child img{aspect-ratio:16/10}
+
+/* =========================================================
+   COUNTDOWN + CALENDAR
+========================================================= */
+.inv-countdown{background:var(--mist);color:var(--ink)}
+.inv-countdown .inv-section-title{color:var(--moss-2)}
+.inv-countdown .divider::after{outline-color:var(--mist)}
+.inv-countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:38px auto 0;max-width:520px}
+.inv-count-item{background:var(--moss);color:var(--gold-soft);padding:20px 4px;border-radius:70px 70px 8px 8px;box-shadow:0 14px 28px rgba(20,38,31,.25)}
+.inv-count-item h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.1}
+.inv-count-item span{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);opacity:.8}
+.calendar-box{text-align:center;margin-top:44px;padding:0 24px}
+.calendar-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:16px;color:var(--muted)}
+.calendar-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border-radius:50px;background:var(--moss);color:var(--gold-soft);font-weight:400;transition:transform .25s,background .25s}
+.calendar-btn:hover{background:var(--moss-2);transform:translateY(-2px)}
+
+/* =========================================================
+   ACARA
+========================================================= */
+.inv-event{padding:40px 0!important}
+.inv-event+.inv-event{padding-top:0!important}
+.inv-event-card{position:relative;max-width:480px;margin:0 auto;padding:46px 30px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(201,161,91,.55);color:var(--paper);border-radius:200px 200px 12px 12px;backdrop-filter:blur(4px)}
+.inv-event-card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(201,161,91,.2);border-radius:194px 194px 8px 8px;pointer-events:none}
+.inv-event-title{font-family:var(--script);font-weight:400;font-size:2.8rem;color:var(--gold-soft);margin-top:10px}
+.inv-event-card p{font-family:var(--serif);font-size:1.15rem;margin-bottom:12px}
+.inv-event-card strong{font-family:var(--sans);font-weight:500;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+
+/* =========================================================
+   MAPS
+========================================================= */
+.inv-map{color:var(--paper)}
+.inv-map-box{margin-top:30px;padding:8px;border:1px solid rgba(201,161,91,.6);border-radius:14px;background:rgba(255,255,255,.05);box-shadow:0 24px 44px rgba(0,0,0,.35)}
+.inv-map-box iframe{display:block;width:100%;height:360px;border:0;border-radius:8px;filter:saturate(.85)}
+
+/* =========================================================
+   E-TICKET
+========================================================= */
+.inv-ticket{background:var(--mist);color:var(--ink)}
+.inv-ticket .inv-section-title{color:var(--moss-2)}
+.inv-ticket .divider::after{outline-color:var(--mist)}
+.eticket-card{display:none;max-width:480px;margin:36px auto 0;background:#fff;border-radius:18px;overflow:hidden;text-align:left;box-shadow:0 24px 48px rgba(20,38,31,.22);position:relative}
+.eticket-card.visible,.eticket-card[style*="block"]{opacity:1;transform:none}
+.ticket-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:linear-gradient(135deg,var(--moss),var(--moss-2));color:var(--gold-soft);font-family:var(--serif);font-size:1.25rem;font-weight:600;letter-spacing:.06em}
+.ticket-body{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:26px 24px;border-top:2px dashed var(--gold-soft);position:relative}
+.ticket-body::before,.ticket-body::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--mist)}
+.ticket-body::before{left:-10px}.ticket-body::after{right:-10px}
+.ticket-left{flex:1;min-width:0}
+.ticket-name{font-family:var(--serif);font-weight:700;font-size:1.55rem;line-height:1.25;color:var(--moss);margin-bottom:14px;word-break:break-word}
+.ticket-status,.ticket-time{display:flex;align-items:center;gap:8px;font-size:.92rem;color:var(--muted);margin-bottom:6px}
+.ticket-status i{color:var(--gold)}
+.ticket-right img{width:130px;height:130px;object-fit:contain;padding:6px;border:1px solid var(--gold-soft);border-radius:8px;background:#fff}
+
+.floating-ticket{position:fixed;right:16px;bottom:18px;z-index:900;display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:50px;background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:var(--night);font-size:.9rem;font-weight:500;box-shadow:0 10px 24px rgba(0,0,0,.4);transition:transform .25s}
+.floating-ticket:hover{transform:translateY(-3px)}
+
+/* =========================================================
+   WEDDING GIFT
+========================================================= */
+.inv-gift{color:var(--paper)}
+.gift-card{max-width:440px;margin:28px auto 0;padding:28px 24px;border:1px solid rgba(201,161,91,.55);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.02));text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.28)}
+.gift-card:first-of-type{margin-top:40px}
+.gift-bank{display:flex;align-items:center;justify-content:center;gap:12px;font-size:.82rem;letter-spacing:.14em;color:var(--gold-soft)}
+.gift-logo{height:26px;width:auto;background:#fff;padding:3px 8px;border-radius:5px}
+.gift-number{font-family:var(--serif);font-weight:700;font-size:2rem;letter-spacing:.12em;margin:14px 0 2px;color:#fff}
+.gift-owner{font-family:var(--serif);font-style:italic;font-size:1.1rem;opacity:.85;margin-bottom:18px}
+.copy-btn{cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:.92rem;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:11px 24px;border-radius:50px;transition:transform .2s}
+.copy-btn:hover{transform:translateY(-2px)}
+#toast,#rsvpToast{position:fixed;left:50%;bottom:30px;z-index:2000;transform:translate(-50%,30px);opacity:0;pointer-events:none;padding:13px 24px;border-radius:50px;background:var(--paper);color:var(--moss);font-weight:500;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,.4);transition:opacity .35s,transform .35s;white-space:nowrap}
+#toast.show,#rsvpToast.show{opacity:1;transform:translate(-50%,0)}
+
+/* =========================================================
+   RSVP & KOMENTAR
+========================================================= */
+.inv-rsvp{background:var(--mist);color:var(--ink)}
+.inv-rsvp .inv-section-title{color:var(--moss-2)}
+.inv-rsvp .divider::after{outline-color:var(--mist)}
+.rsvp-form{max-width:520px;margin:34px auto 0;display:flex;flex-direction:column;gap:14px;text-align:left}
+.rsvp-form input,.rsvp-form textarea{width:100%;font-family:var(--sans);font-size:1rem;font-weight:300;color:var(--ink);background:#fff;border:1px solid #d6ddd5;border-radius:12px;padding:14px 18px;resize:vertical;transition:border-color .25s,box-shadow .25s}
+.rsvp-form input:focus,.rsvp-form textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,161,91,.2)}
+#sendRSVP{cursor:pointer;font-family:var(--sans);font-size:1rem;color:var(--gold-soft);background:var(--moss);border:none;border-radius:50px;padding:14px;transition:background .25s,transform .25s}
+#sendRSVP:hover{background:var(--moss-2);transform:translateY(-2px)}
+#sendRSVP:disabled{opacity:.6;cursor:wait}
+.comments-header{margin:46px 0 18px}
+.comment-counter{display:inline-block;font-family:var(--serif);font-weight:600;font-size:1.2rem;padding:8px 22px;border-radius:50px;background:var(--moss);color:var(--gold-soft)}
+.comments-loading{font-family:var(--serif);font-style:italic;color:var(--muted)}
+#comments{max-width:560px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:14px}
+#comments>div,#comments .comment,#comments .comment-item,#comments .comment-card{background:#fff;border-left:3px solid var(--gold);border-radius:10px;padding:16px 20px;box-shadow:0 8px 20px rgba(20,38,31,.08)}
+#comments b,#comments strong,#comments .comment-name{display:block;font-family:var(--serif);font-weight:700;font-size:1.15rem;color:var(--moss)}
+#comments small,#comments .comment-time{font-size:.75rem;color:var(--muted)}
+#comments p{margin-top:4px;word-break:break-word}
+.read-more-wrapper{margin-top:24px}
+.load-more-btn{cursor:pointer;font-family:var(--sans);font-size:.95rem;color:var(--moss);background:transparent;border:1px solid var(--moss);border-radius:50px;padding:11px 30px;transition:background .25s,color .25s}
+.load-more-btn:hover{background:var(--moss);color:var(--gold-soft)}
+
+/* =========================================================
+   PENUTUP
+========================================================= */
+.inv-footer{color:var(--paper);padding-bottom:130px!important}
+.inv-footer-title{font-family:var(--script);font-weight:400;font-size:clamp(2.8rem,10vw,4rem);color:var(--gold)}
+.inv-footer .inv-text{margin-bottom:34px}
+
+/* =========================================================
+   RESPONSIVE + MOTION
+========================================================= */
+@media(max-width:480px){
+    section[class^="inv-"]{padding:70px 0}
+    .inv-map-box iframe{height:280px}
+    .ticket-body{flex-direction:column-reverse;text-align:center}
+    .ticket-status,.ticket-time{justify-content:center}
+    .gift-number{font-size:1.65rem}
+    .floating-ticket span{display:none}
+    .floating-ticket{padding:14px;font-size:1.1rem}
+}
+@media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .fade-up{opacity:1!important;transform:none!important}
+}
+</style>
 </head>
 
 <body>
@@ -36,50 +295,29 @@
 
     <!-- Cover -->
     <section class="cover">
-            
+
         <div class="cover-content">
 
-            <p class="subtitle fade-up">
-                THE WEDDING OF
-            </p>
+            <p class="subtitle fade-up">THE WEDDING OF</p>
 
-            <h1 class="title fade-up">
-                Rey Mboyong, S.H
-            </h1>
+            <h1 class="title fade-up">Rey Mboyong, S.H</h1>
 
             <div class="and fade-up">&</div>
 
-            <h1 class="title fade-up">
-                Dinda Hai, S.Gz
-            </h1>
+            <h1 class="title fade-up">Dinda Hai, S.Gz</h1>
 
             <div class="divider fade-up"></div>
 
-            <p class="date fade-up">
-                Minggu, 1 Januari 2027
-            </p>
+            <p class="date fade-up">Minggu, 1 Januari 2027</p>
 
             <div class="guest-box fade-up">
-
                 <small>Kepada Yth.</small>
-
-                   <h2 id="coverguestName">
-                    Tamu Undangan
-                    </h2>
-
+                <h2 id="coverguestName">Tamu Undangan</h2>
             </div>
 
-            <button id="openInvitation" class="btn-open fade-up">
+            <button id="openInvitation" class="btn-open fade-up">💌 Buka Undangan</button>
 
-                💌 Buka Undangan
-
-            </button>
-
-            <p class="note fade-up">
-
-                Mohon maaf apabila terdapat kesalahan penulisan nama atau gelar.
-
-            </p>
+            <p class="note fade-up">Mohon maaf apabila terdapat kesalahan penulisan nama atau gelar.</p>
 
         </div>
 
@@ -87,1245 +325,811 @@
 
     <div id="invitationContent">
 
- <audio id="bgMusic" loop>
+        <audio id="bgMusic" loop>
+            <source src="music/wedding.mp3" type="audio/mpeg">
+        </audio>
 
-        <source src="music/wedding.mp3" type="audio/mpeg">
+        <!-- ================= HERO ================= -->
+        <section class="inv-hero">
+            <div class="inv-container">
 
-    </audio>
+                <p class="inv-subtitle fade-up">Wedding Invitation</p>
 
-    
-    <!--=========================================
-                HERO SECTION
-    ==========================================-->
+                <h1 class="inv-title fade-up">Rey Mboyong, S.H</h1>
 
-    <section class="inv-hero">
+                <div class="inv-and fade-up">&</div>
 
-        <div class="inv-container">
+                <h1 class="inv-title fade-up">Dinda Hai, S.Gz</h1>
 
-            <p class="inv-subtitle fade-up">
+                <div class="divider fade-up"></div>
 
-                Wedding Invitation
+                <p class="inv-desc fade-up">Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
 
-            </p>
+                <p class="inv-text fade-up">
+                    Dengan memohon rahmat dan ridho Allah SWT,
+                    kami bermaksud menyelenggarakan acara
+                    pernikahan putra-putri kami dan dengan penuh
+                    rasa hormat mengundang Bapak/Ibu/Saudara/i
+                    untuk hadir memberikan doa restu.
+                </p>
 
-            <h1 class="inv-title fade-up">
-
-                Rey Mboyong, S.H
-
-            </h1>
-
-            <div class="inv-and fade-up">
-
-                &
-
-            </div>
-
-            <h1 class="inv-title fade-up">
-
-                Dinda Hai, S.Gz
-
-            </h1>
-
-            <div class="divider fade-up"></div>
-
-            <p class="inv-desc fade-up">
-
-                Assalamu'alaikum Warahmatullahi Wabarakatuh
-
-            </p>
-
-            <p class="inv-text fade-up">
-
-                Dengan memohon rahmat dan ridho Allah SWT,
-                kami bermaksud menyelenggarakan acara
-                pernikahan putra-putri kami dan dengan penuh
-                rasa hormat mengundang Bapak/Ibu/Saudara/i
-                untuk hadir memberikan doa restu.
-
-            </p>
-
-            <div class="inv-scroll fade-up">
-
-                <span></span>
-
-                <p>Scroll Ke Bawah</p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-                AYAT AL QURAN
-    ==========================================-->
-
-    <section class="inv-verse">
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Ayat Suci Al-Qur'an
-
-            </p>
-
-            <div class="divider fade-up"></div>
-
-            <h2 class="inv-arab fade-up">
-
-                وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ
-                مِنْ أَنْفُسِكُمْ أَزْوَاجًا
-                لِتَسْكُنُوا إِلَيْهَا
-                وَجَعَلَ بَيْنَكُمْ
-                مَوَدَّةً وَرَحْمَةً
-
-            </h2>
-
-            <p class="inv-latin fade-up">
-
-                Wa min āyātihī an khalaqa lakum
-                min anfusikum azwājal litas-kunū
-                ilaihā wa ja'ala bainakum
-                mawaddataw wa raḥmah.
-
-            </p>
-
-            <p class="inv-translate fade-up">
-
-                "Dan di antara tanda-tanda kebesaran-Nya
-                ialah Dia menciptakan pasangan-pasangan
-                untukmu dari jenismu sendiri agar kamu
-                merasa tenteram kepadanya, dan Dia
-                menjadikan di antaramu rasa kasih
-                dan sayang."
-
-            </p>
-
-            <p class="inv-source fade-up">
-
-                QS. Ar-Rum : 21
-
-            </p>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-            HERO PREWEDDING
-    ==========================================-->
-
-    <section class="inv-prewed">
-
-        <div class="inv-prewed-overlay"></div>
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Our Journey Begins
-
-            </p>
-
-            <h2 class="inv-prewed-title fade-up">
-
-                Together Forever
-
-            </h2>
-
-            <p class="inv-text fade-up">
-
-                Every love story is beautiful,
-                but ours is our favorite.
-
-            </p>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-        PART 2 DIMULAI DARI SINI
-    ==========================================-->
-        <!--=========================================
-                COUPLE SECTION
-    ==========================================-->
-
-    <section class="inv-couple">
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Bride & Groom
-
-            </p>
-
-            <div class="divider fade-up"></div>
-
-            <p class="inv-text fade-up">
-
-                Dengan memohon rahmat Allah SWT,
-                kami memperkenalkan kedua mempelai.
-
-            </p>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-                MEMPELAI PRIA
-    ==========================================-->
-
-    <section class="inv-groom">
-
-        <div class="inv-container">
-
-            <div class="inv-profile fade-up">
-
-                <div class="inv-photo-frame">
-
-                    <img
-                        src="images/groom.jpg"
-                        alt="Rey Mboyong, S.H"
-                        class="inv-photo">
-
-                </div>
-
-                <div class="inv-profile-content">
-
-                    <p class="inv-profile-label">
-
-                        Mempelai Pria
-
-                    </p>
-
-                    <h2 class="inv-profile-name">
-
-                        Rey Mboyong, S.H
-
-                    </h2>
-
-                    <div class="divider"></div>
-
-                    <p class="inv-profile-desc">
-
-                        Putra Pertama dari
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        Bapak Nama Ayah
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        &
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        Ibu Nama Ibu
-
-                    </p>
-
+                <div class="inv-scroll fade-up">
+                    <span></span>
+                    <p>Scroll Ke Bawah</p>
                 </div>
 
             </div>
+        </section>
 
-        </div>
+        <!-- ================= AYAT ================= -->
+        <section class="inv-verse">
+            <div class="inv-container">
 
-    </section>
+                <p class="inv-section-title fade-up">Ayat Suci Al-Qur'an</p>
 
+                <div class="divider fade-up"></div>
 
-
-    <!--=========================================
-                ORNAMEN
-    ==========================================-->
-
-    <section class="inv-love">
-
-        <div class="inv-container">
-
-            <div class="inv-love-icon fade-up">
-
-                ❤
-
-            </div>
-
-            <p class="inv-love-text fade-up">
-
-                "Two souls become one in the
-                blessing of Allah."
-
-            </p>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-                MEMPELAI WANITA
-    ==========================================-->
-
-    <section class="inv-bride">
-
-        <div class="inv-container">
-
-            <div class="inv-profile inv-profile-reverse fade-up">
-
-                <div class="inv-photo-frame">
-
-                    <img
-                        src="images/bride.jpg"
-                        alt="Dinda Hai, S.Gz"
-                        class="inv-photo">
-
-                </div>
-
-                <div class="inv-profile-content">
-
-                    <p class="inv-profile-label">
-
-                        Mempelai Wanita
-
-                    </p>
-
-                    <h2 class="inv-profile-name">
-
-                        Dinda Hai, S.Gz
-
-                    </h2>
-
-                    <div class="divider"></div>
-
-                    <p class="inv-profile-desc">
-
-                        Putri Pertama dari
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        Bapak Nama Ayah
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        &
-
-                    </p>
-
-                    <p class="inv-parent">
-
-                        Ibu Nama Ibu
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-            FOTO PREWEDDING
-    ==========================================-->
-
-    <section class="inv-gallery-preview">
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Our Moments
-
-            </p>
-
-            <div class="divider fade-up"></div>
-
-            <p class="inv-text fade-up">
-
-                Setiap perjalanan memiliki cerita,
-                dan setiap cerita memiliki kenangan
-                yang akan selalu kami abadikan.
-
-            </p>
-
-            <div class="inv-gallery-grid fade-up">
-
-                <div class="inv-gallery-item">
-
-                    <img
-                        src="images/prewed-1.jpg"
-                        alt="Prewedding 1">
-
-                </div>
-
-                <div class="inv-gallery-item">
-
-                    <img
-                        src="images/prewed-2.jpg"
-                        alt="Prewedding 2">
-
-                </div>
-
-                <div class="inv-gallery-item">
-
-                    <img
-                        src="images/prewed-3.jpg"
-                        alt="Prewedding 3">
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-        PART 3 DIMULAI DARI SINI
-    ==========================================-->
-
-        <!--=========================================
-                COUNTDOWN
-    ==========================================-->
-
-    <section class="inv-countdown">
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Save The Date
-
-            </p>
-
-            <div class="divider fade-up"></div>
-
-            <p class="inv-text fade-up">
-
-                Kami berharap kehadiran dan doa restu Anda
-                pada hari yang berbahagia.
-
-            </p>
-
-            <div class="inv-countdown-grid fade-up">
-
-                <div class="inv-count-item">
-
-                    <h2 id="day">00</h2>
-
-                    <span>Hari</span>
-
-                </div>
-
-                <div class="inv-count-item">
-
-                    <h2 id="hour">00</h2>
-
-                    <span>Jam</span>
-
-                </div>
-
-                <div class="inv-count-item">
-
-                    <h2 id="minute">00</h2>
-
-                    <span>Menit</span>
-
-                </div>
-
-                <div class="inv-count-item">
-
-                    <h2 id="second">00</h2>
-
-                    <span>Detik</span>
-
-                </div>
-
-            </div>
-
-        </div>
-        <div class="calendar-box fade-up">
-
-    <p class="calendar-title">
-        Tandai tanggal bahagia kami di kalender Anda
-    </p>
-
-    <a
-        id="googleCalendarBtn"
-        class="calendar-btn"
-        target="_blank">
-
-        <i class="fa-brands fa-google"></i>
-
-        Tambahkan ke Google Calendar
-
-    </a>
-
-</div>
-
-    </section>
-
-
-
-    <!--=========================================
-                AKAD
-    ==========================================-->
-
-    <section class="inv-event">
-
-        <div class="inv-container">
-
-            <div class="inv-event-card fade-up">
-
-                <h2 class="inv-event-title">
-
-                    Akad Nikah
-
+                <h2 class="inv-arab fade-up">
+                    وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ
+                    مِنْ أَنْفُسِكُمْ أَزْوَاجًا
+                    لِتَسْكُنُوا إِلَيْهَا
+                    وَجَعَلَ بَيْنَكُمْ
+                    مَوَدَّةً وَرَحْمَةً
                 </h2>
 
-                <div class="divider"></div>
-
-                <p>
-
-                    <strong>Hari</strong><br>
-
-                    Minggu
-
+                <p class="inv-latin fade-up">
+                    Wa min āyātihī an khalaqa lakum
+                    min anfusikum azwājal litas-kunū
+                    ilaihā wa ja'ala bainakum
+                    mawaddataw wa raḥmah.
                 </p>
 
-                <p>
-
-                    <strong>Tanggal</strong><br>
-
-                    1 Januari 2027
-
+                <p class="inv-translate fade-up">
+                    "Dan di antara tanda-tanda kebesaran-Nya
+                    ialah Dia menciptakan pasangan-pasangan
+                    untukmu dari jenismu sendiri agar kamu
+                    merasa tenteram kepadanya, dan Dia
+                    menjadikan di antaramu rasa kasih
+                    dan sayang."
                 </p>
 
-                <p>
+                <p class="inv-source fade-up">QS. Ar-Rum : 21</p>
 
-                    <strong>Waktu</strong><br>
+            </div>
+        </section>
 
-                    08.00 WIB
+        <!-- ================= PREWEDDING HERO ================= -->
+        <section class="inv-prewed">
 
-                </p>
+            <div class="inv-prewed-overlay"></div>
 
-                <p>
+            <div class="inv-container">
 
-                    <strong>Tempat</strong><br>
+                <p class="inv-section-title fade-up">Our Journey Begins</p>
 
-                    Gedung Serbaguna Apel
+                <h2 class="inv-prewed-title fade-up">Together Forever</h2>
 
-                </p>
-
-                <p>
-
-                    Jl. Apel No.123
-                    Surabaya
-
+                <p class="inv-text fade-up">
+                    Every love story is beautiful,
+                    but ours is our favorite.
                 </p>
 
             </div>
 
-        </div>
+        </section>
 
-    </section>
+        <!-- ================= COUPLE ================= -->
+        <section class="inv-couple">
+            <div class="inv-container">
 
+                <p class="inv-section-title fade-up">Bride & Groom</p>
 
+                <div class="divider fade-up"></div>
 
-    <!--=========================================
-                RESEPSI
-    ==========================================-->
-
-    <section class="inv-event">
-
-        <div class="inv-container">
-
-            <div class="inv-event-card fade-up">
-
-                <h2 class="inv-event-title">
-
-                    Resepsi
-
-                </h2>
-
-                <div class="divider"></div>
-
-                <p>
-
-                    <strong>Hari</strong><br>
-
-                    Minggu
-
-                </p>
-
-                <p>
-
-                    <strong>Tanggal</strong><br>
-
-                    1 Januari 2027
-
-                </p>
-
-                <p>
-
-                    <strong>Waktu</strong><br>
-
-                    11.00 WIB
-                    - Selesai
-
-                </p>
-
-                <p>
-
-                    <strong>Tempat</strong><br>
-
-                    Gedung Serbaguna Mangga
-
-                </p>
-
-                <p>
-
-                    Jl. Mangga No.123
-                    Surabaya
-
+                <p class="inv-text fade-up">
+                    Dengan memohon rahmat Allah SWT,
+                    kami memperkenalkan kedua mempelai.
                 </p>
 
             </div>
+        </section>
 
-        </div>
+        <!-- ================= MEMPELAI PRIA ================= -->
+        <section class="inv-groom">
+            <div class="inv-container">
 
-    </section>
+                <div class="inv-profile fade-up">
 
-
-
-    <!--=========================================
-                GOOGLE MAPS
-    ==========================================-->
-
-    <section class="inv-map">
-
-        <div class="inv-container">
-
-            <p class="inv-section-title fade-up">
-
-                Lokasi Acara
-
-            </p>
-
-            <div class="divider fade-up"></div>
-
-            <div class="inv-map-box fade-up">
-
-                <!-- Ganti src nanti dengan Google Maps Embed -->
-
-                <iframe
-
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.0419244298887!2d112.70325967441977!3d-7.460614192550785!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e12fd61d3a8b%3A0xe625b2be5d1c2086!2sDr.Desember%20-%20Drg.ElangMW!5e0!3m2!1sen!2sid!4v1782822650028!5m2!1sen!2sid"
-
-                    loading="lazy"
-
-                    allowfullscreen>
-
-                </iframe>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!--=========================================
-                TICKET
-    ==========================================-->
-<!--=========================================
-                E-TICKET
-==========================================-->
-
-<section id="eticket" class="inv-ticket">
-
-    <div class="inv-container">
-
-        <p class="inv-section-title fade-up">
-            E-Ticket
-        </p>
-
-        <div class="divider fade-up"></div>
-
-        <p class="inv-text fade-up">
-            Tunjukkan QR Code berikut kepada petugas ketika memasuki lokasi acara.
-        </p>
-
-        <div id="ticket" class="eticket-card fade-up">
-
-            <div class="ticket-header">
-
-                <i class="fa-solid fa-ticket"></i>
-
-                <span>E-Ticket Wedding</span>
-
-            </div>
-
-            <div class="ticket-body">
-
-                <div class="ticket-left">
-
-                    <div class="ticket-name" id="ticketguestName"></div>
-
-                    <div class="ticket-status">
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                        <span id="guestStatus"></span>
-
+                    <div class="inv-photo-frame">
+                        <img src="images/groom.jpg" alt="Rey Mboyong, S.H" class="inv-photo">
                     </div>
 
-                    <div class="ticket-time">
+                    <div class="inv-profile-content">
 
-                        <i class="fa-solid fa-clock"></i>
+                        <p class="inv-profile-label">Mempelai Pria</p>
 
-                        <span id="guestTime"></span>
+                        <h2 class="inv-profile-name">Rey Mboyong, S.H</h2>
+
+                        <div class="divider"></div>
+
+                        <p class="inv-profile-desc">Putra Pertama dari</p>
+
+                        <p class="inv-parent">Bapak Nama Ayah</p>
+
+                        <p class="inv-parent">&</p>
+
+                        <p class="inv-parent">Ibu Nama Ibu</p>
 
                     </div>
 
                 </div>
 
-                <div class="ticket-right">
+            </div>
+        </section>
 
-                    <img id="qrImage">
+        <!-- ================= ORNAMEN ================= -->
+        <section class="inv-love">
+            <div class="inv-container">
+
+                <div class="inv-love-icon fade-up">❤</div>
+
+                <p class="inv-love-text fade-up">
+                    "Two souls become one in the
+                    blessing of Allah."
+                </p>
+
+            </div>
+        </section>
+
+        <!-- ================= MEMPELAI WANITA ================= -->
+        <section class="inv-bride">
+            <div class="inv-container">
+
+                <div class="inv-profile inv-profile-reverse fade-up">
+
+                    <div class="inv-photo-frame">
+                        <img src="images/bride.jpg" alt="Dinda Hai, S.Gz" class="inv-photo">
+                    </div>
+
+                    <div class="inv-profile-content">
+
+                        <p class="inv-profile-label">Mempelai Wanita</p>
+
+                        <h2 class="inv-profile-name">Dinda Hai, S.Gz</h2>
+
+                        <div class="divider"></div>
+
+                        <p class="inv-profile-desc">Putri Pertama dari</p>
+
+                        <p class="inv-parent">Bapak Nama Ayah</p>
+
+                        <p class="inv-parent">&</p>
+
+                        <p class="inv-parent">Ibu Nama Ibu</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= FOTO PREWEDDING ================= -->
+        <section class="inv-gallery-preview">
+            <div class="inv-container">
+
+                <p class="inv-section-title fade-up">Our Moments</p>
+
+                <div class="divider fade-up"></div>
+
+                <p class="inv-text fade-up">
+                    Setiap perjalanan memiliki cerita,
+                    dan setiap cerita memiliki kenangan
+                    yang akan selalu kami abadikan.
+                </p>
+
+                <div class="inv-gallery-grid fade-up">
+
+                    <div class="inv-gallery-item">
+                        <img src="images/prewed-1.jpg" alt="Prewedding 1">
+                    </div>
+
+                    <div class="inv-gallery-item">
+                        <img src="images/prewed-2.jpg" alt="Prewedding 2">
+                    </div>
+
+                    <div class="inv-gallery-item">
+                        <img src="images/prewed-3.jpg" alt="Prewedding 3">
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= COUNTDOWN ================= -->
+        <section class="inv-countdown">
+
+            <div class="inv-container">
+
+                <p class="inv-section-title fade-up">Save The Date</p>
+
+                <div class="divider fade-up"></div>
+
+                <p class="inv-text fade-up">
+                    Kami berharap kehadiran dan doa restu Anda
+                    pada hari yang berbahagia.
+                </p>
+
+                <div class="inv-countdown-grid fade-up">
+
+                    <div class="inv-count-item">
+                        <h2 id="day">00</h2>
+                        <span>Hari</span>
+                    </div>
+
+                    <div class="inv-count-item">
+                        <h2 id="hour">00</h2>
+                        <span>Jam</span>
+                    </div>
+
+                    <div class="inv-count-item">
+                        <h2 id="minute">00</h2>
+                        <span>Menit</span>
+                    </div>
+
+                    <div class="inv-count-item">
+                        <h2 id="second">00</h2>
+                        <span>Detik</span>
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+            <div class="calendar-box fade-up">
 
-    </div>
+                <p class="calendar-title">Tandai tanggal bahagia kami di kalender Anda</p>
 
-</section>
-    <!--=========================================
-                WEDDING GIFT
-    ==========================================-->
-    <section class="inv-gift">
-
-    <div class="inv-container">
-
-        <p class="inv-section-title fade-up">
-            Wedding Gift
-        </p>
-
-        <div class="divider"></div>
-
-        <p class="inv-text fade-up">
-
-            Doa restu Anda merupakan hadiah terindah bagi kami.
-            Namun apabila ingin memberikan tanda kasih,
-            dapat melalui rekening berikut.
-
-        </p>
-
-        <!-- Card 1 -->
-
-        <div class="gift-card fade-up">
-
-            <div class="gift-bank">
-
-                <img src="images/bca-logo.svg" class="gift-logo">
-
-                <span>BANK CENTRAL ASIA (BCA)</span>
+                <a id="googleCalendarBtn" class="calendar-btn" target="_blank" rel="noopener">
+                    <i class="fa-brands fa-google"></i>
+                    Tambahkan ke Google Calendar
+                </a>
 
             </div>
 
-            <div class="gift-number" id="rekening1">
+        </section>
 
-                0181831145
+        <!-- ================= AKAD ================= -->
+        <section class="inv-event">
+            <div class="inv-container">
+
+                <div class="inv-event-card fade-up">
+
+                    <h2 class="inv-event-title">Akad Nikah</h2>
+
+                    <div class="divider"></div>
+
+                    <p><strong>Hari</strong><br>Minggu</p>
+
+                    <p><strong>Tanggal</strong><br>1 Januari 2027</p>
+
+                    <p><strong>Waktu</strong><br>08.00 WIB</p>
+
+                    <p><strong>Tempat</strong><br>Gedung Serbaguna Apel</p>
+
+                    <p>Jl. Apel No.123 Surabaya</p>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= RESEPSI ================= -->
+        <section class="inv-event">
+            <div class="inv-container">
+
+                <div class="inv-event-card fade-up">
+
+                    <h2 class="inv-event-title">Resepsi</h2>
+
+                    <div class="divider"></div>
+
+                    <p><strong>Hari</strong><br>Minggu</p>
+
+                    <p><strong>Tanggal</strong><br>1 Januari 2027</p>
+
+                    <p><strong>Waktu</strong><br>11.00 WIB - Selesai</p>
+
+                    <p><strong>Tempat</strong><br>Gedung Serbaguna Mangga</p>
+
+                    <p>Jl. Mangga No.123 Surabaya</p>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= GOOGLE MAPS ================= -->
+        <section class="inv-map">
+            <div class="inv-container">
+
+                <p class="inv-section-title fade-up">Lokasi Acara</p>
+
+                <div class="divider fade-up"></div>
+
+                <div class="inv-map-box fade-up">
+
+                    <!-- Ganti src nanti dengan Google Maps Embed -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.0419244298887!2d112.70325967441977!3d-7.460614192550785!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e12fd61d3a8b%3A0xe625b2be5d1c2086!2sDr.Desember%20-%20Drg.ElangMW!5e0!3m2!1sen!2sid!4v1782822650028!5m2!1sen!2sid"
+                        loading="lazy"
+                        allowfullscreen>
+                    </iframe>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= E-TICKET ================= -->
+        <section id="eticket" class="inv-ticket">
+
+            <div class="inv-container">
+
+                <p class="inv-section-title fade-up">E-Ticket</p>
+
+                <div class="divider fade-up"></div>
+
+                <p class="inv-text fade-up">
+                    Tunjukkan QR Code berikut kepada petugas ketika memasuki lokasi acara.
+                </p>
+
+                <div id="ticket" class="eticket-card fade-up">
+
+                    <div class="ticket-header">
+                        <i class="fa-solid fa-ticket"></i>
+                        <span>E-Ticket Wedding</span>
+                    </div>
+
+                    <div class="ticket-body">
+
+                        <div class="ticket-left">
+
+                            <div class="ticket-name" id="ticketguestName"></div>
+
+                            <div class="ticket-status">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span id="guestStatus"></span>
+                            </div>
+
+                            <div class="ticket-time">
+                                <i class="fa-solid fa-clock"></i>
+                                <span id="guestTime"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="ticket-right">
+                            <img id="qrImage" alt="QR Code Tamu">
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
-            <div class="gift-owner">
+        </section>
 
-                a.n. Anggara Wisnu Wardhana
+        <!-- ================= WEDDING GIFT ================= -->
+        <section class="inv-gift">
+
+            <div class="inv-container">
+
+                <p class="inv-section-title fade-up">Wedding Gift</p>
+
+                <div class="divider"></div>
+
+                <p class="inv-text fade-up">
+                    Doa restu Anda merupakan hadiah terindah bagi kami.
+                    Namun apabila ingin memberikan tanda kasih,
+                    dapat melalui rekening berikut.
+                </p>
+
+                <!-- Card 1 -->
+                <div class="gift-card fade-up">
+
+                    <div class="gift-bank">
+                        <img src="images/bca-logo.svg" class="gift-logo" alt="BCA">
+                        <span>BANK CENTRAL ASIA (BCA)</span>
+                    </div>
+
+                    <div class="gift-number" id="rekening1">0181831145</div>
+
+                    <div class="gift-owner">a.n. Anggara Wisnu Wardhana</div>
+
+                    <button class="copy-btn" onclick="copyRekening('rekening1')">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm4 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/>
+                        </svg>
+                        Salin Nomor
+                    </button>
+
+                </div>
+
+                <!-- Card 2 -->
+                <div class="gift-card fade-up">
+
+                    <div class="gift-bank">
+                        <img src="images/bca-logo.svg" class="gift-logo" alt="BCA">
+                        <span>BANK CENTRAL ASIA (BCA)</span>
+                    </div>
+
+                    <div class="gift-number" id="rekening2">0181831145</div>
+
+                    <div class="gift-owner">a.n. Pasangan Anda</div>
+
+                    <button class="copy-btn" onclick="copyRekening('rekening2')">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm4 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/>
+                        </svg>
+                        Salin Nomor
+                    </button>
+
+                </div>
 
             </div>
 
-            <button
-                class="copy-btn"
-                onclick="copyRekening('rekening1')">
+        </section>
 
-                <svg
-                    viewBox="0 0 24 24"
-                    width="20"
-                    height="20">
+        <div id="toast">✔ Nomor rekening berhasil disalin</div>
 
-                    <path fill="currentColor"
-                        d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm4
-                        4H8a2 2 0 0 0-2 2v14a2 2 0 0
-                        0 2 2h12a2 2 0 0 0 2-2V7a2
-                        2 0 0 0-2-2z"/>
+        <!-- ================= RSVP ================= -->
+        <section class="inv-rsvp">
 
-                </svg>
+            <div class="inv-container">
 
-                Salin Nomor
+                <p class="inv-section-title fade-up">Ucapan & Doa</p>
 
-            </button>
+                <div class="divider fade-up"></div>
 
-        </div>
+                <p class="inv-text fade-up">
+                    Kehadiran dan doa restu Anda merupakan kebahagiaan bagi kami.
+                    Silakan tinggalkan ucapan terbaik Anda.
+                </p>
 
-        <!-- Card 2 -->
+                <div class="rsvp-form fade-up">
 
-        <div class="gift-card fade-up">
+                    <input type="text" id="rsvpName" placeholder="Nama Anda">
 
-            <div class="gift-bank">
+                    <textarea id="rsvpMessage" placeholder="Tuliskan ucapan..." rows="5"></textarea>
 
-                <img src="images/bca-logo.svg" class="gift-logo">
+                    <button id="sendRSVP">Kirim Ucapan</button>
 
-                <span>BANK CENTRAL ASIA (BCA)</span>
+                </div>
 
-            </div>
+                <div id="rsvpToast">✔ Ucapan berhasil dikirim</div>
 
-            <div class="gift-number" id="rekening2">
+                <div class="comments-header">
+                    <div id="commentCounter" class="comment-counter">❤️ 0 Ucapan</div>
+                </div>
 
-                0181831145
+                <div id="commentsLoading" class="comments-loading">Memuat ucapan...</div>
 
-            </div>
+                <div id="comments"></div>
 
-            <div class="gift-owner">
-
-                a.n. Pasangan Anda
+                <div class="read-more-wrapper">
+                    <button id="loadMoreBtn" class="load-more-btn">Read More</button>
+                </div>
 
             </div>
 
-            <button
-                class="copy-btn"
-                onclick="copyRekening('rekening2')">
+        </section>
 
-                <svg
-                    viewBox="0 0 24 24"
-                    width="20"
-                    height="20">
+        <!-- ================= PENUTUP ================= -->
+        <section class="inv-footer">
 
-                    <path fill="currentColor"
-                        d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm4
-                        4H8a2 2 0 0 0-2 2v14a2 2 0 0
-                        0 2 2h12a2 2 0 0 0 2-2V7a2
-                        2 0 0 0-2-2z"/>
+            <div class="inv-container">
 
-                </svg>
+                <h2 class="inv-footer-title fade-up">Terima Kasih</h2>
 
-                Salin Nomor
+                <div class="divider fade-up"></div>
 
-            </button>
+                <p class="inv-text fade-up">
+                    Merupakan suatu kehormatan dan
+                    kebahagiaan bagi kami apabila
+                    Bapak/Ibu/Saudara/i berkenan hadir
+                    untuk memberikan doa restu.
+                </p>
 
-        </div>
+                <h2 class="inv-title fade-up">Rey Mboyong, S.H</h2>
 
-    </div>
+                <div class="inv-and fade-up">&</div>
 
-</section>
-
-<div id="toast">
-
-    ✔ Nomor rekening berhasil disalin
-
-</div>
-
-    <!--=========================================
-                RSVP
-==========================================-->
-
-<section class="inv-rsvp">
-
-    <div class="inv-container">
-
-        <p class="inv-section-title fade-up">
-            Ucapan & Doa
-        </p>
-
-        <div class="divider fade-up"></div>
-
-        <p class="inv-text fade-up">
-            Kehadiran dan doa restu Anda merupakan kebahagiaan bagi kami.
-            Silakan tinggalkan ucapan terbaik Anda.
-        </p>
-
-        <div class="rsvp-form fade-up">
-
-            <input
-                type="text"
-                id="rsvpName"
-                placeholder="Nama Anda">
-
-            <textarea
-                id="rsvpMessage"
-                placeholder="Tuliskan ucapan..."
-                rows="5"></textarea>
-
-            <button id="sendRSVP">
-                Kirim Ucapan
-            </button>
-
-        </div>
-
-        <div id="rsvpToast">
-            ✔ Ucapan berhasil dikirim
-        </div>
-
-<div class="comments-header">
-
-    <div id="commentCounter" class="comment-counter">
-        ❤️ 0 Ucapan
-    </div>
-
-</div>
-
-<div id="commentsLoading" class="comments-loading">
-    Memuat ucapan...
-</div>
-
-<div id="comments"></div>
-
-<div class="read-more-wrapper">
-
-    <button id="loadMoreBtn" class="load-more-btn">
-        Read More
-    </button>
-
-</div>
-
-    </div>
-
-</section>
-
-    <!--=========================================
-                PENUTUP
-    ==========================================-->
-
-    <section class="inv-footer">
-
-        <div class="inv-container">
-
-            <h2 class="inv-footer-title fade-up">
-
-                Terima Kasih
-
-            </h2>
-
-            <div class="divider fade-up"></div>
-
-            <p class="inv-text fade-up">
-
-                Merupakan suatu kehormatan dan
-                kebahagiaan bagi kami apabila
-                Bapak/Ibu/Saudara/i berkenan hadir
-                untuk memberikan doa restu.
-
-            </p>
-
-            <h2 class="inv-title fade-up">
-
-                Rey Mboyong, S.H
-
-            </h2>
-
-            <div class="inv-and fade-up">
-
-                &
+                <h2 class="inv-title fade-up">Dinda Hai, S.Gz</h2>
 
             </div>
 
-            <h2 class="inv-title fade-up">
+        </section>
 
-                Dinda Hai, S.Gz
+        <script>
 
-            </h2>
-
-        </div>
-
-    </section>
-
-
-
-    <!--=========================================
-                MUSIC
-    ==========================================-->
-
-    <script>
-
-        
         // =======================================
-    // COUNTDOWN
-    // =======================================
+        // COUNTDOWN
+        // =======================================
 
-// Format:
-// Tahun, Bulan(0-11), Tanggal, Jam, Menit, Detik
-const weddingDate = new Date(2027, 0, 1, 10, 0, 0).getTime();
+        // Format: Tahun, Bulan(0-11), Tanggal, Jam, Menit, Detik
+        const weddingDate = new Date(2027, 0, 1, 10, 0, 0).getTime();
 
-const day = document.getElementById("day");
-const hour = document.getElementById("hour");
-const minute = document.getElementById("minute");
-const second = document.getElementById("second");
+        const day = document.getElementById("day");
+        const hour = document.getElementById("hour");
+        const minute = document.getElementById("minute");
+        const second = document.getElementById("second");
 
-function updateCountdown() {
+        function updateCountdown() {
 
-    const now = new Date().getTime();
+            const now = new Date().getTime();
 
-    const distance = weddingDate - now;
+            const distance = weddingDate - now;
 
-    if (distance <= 0) {
+            if (distance <= 0) {
 
-        day.textContent = "00";
-        hour.textContent = "00";
-        minute.textContent = "00";
-        second.textContent = "00";
+                day.textContent = "00";
+                hour.textContent = "00";
+                minute.textContent = "00";
+                second.textContent = "00";
 
-        clearInterval(timer);
+                clearInterval(timer);
 
-        return;
-    }
+                return;
+            }
 
-    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const d = Math.floor(distance / (1000 * 60 * 60 * 24));
 
-    const h = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) /
-        (1000 * 60 * 60)
-    );
+            const h = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) /
+                (1000 * 60 * 60)
+            );
 
-    const m = Math.floor(
-        (distance % (1000 * 60 * 60)) /
-        (1000 * 60)
-    );
+            const m = Math.floor(
+                (distance % (1000 * 60 * 60)) /
+                (1000 * 60)
+            );
 
-    const s = Math.floor(
-        (distance % (1000 * 60)) /
-        1000
-    );
+            const s = Math.floor(
+                (distance % (1000 * 60)) /
+                1000
+            );
 
-    day.textContent = String(d).padStart(2, "0");
-    hour.textContent = String(h).padStart(2, "0");
-    minute.textContent = String(m).padStart(2, "0");
-    second.textContent = String(s).padStart(2, "0");
-
-}
-
-updateCountdown();
-
-const timer = setInterval(updateCountdown, 1000);
-
-                // =======================================
-    // COPY REKENING
-    // =======================================
-
-        function copyRekening(id){
-
-    const nomor=document
-        .getElementById(id)
-        .innerText
-        .trim();
-
-    navigator.clipboard.writeText(nomor);
-
-    const toast=document.getElementById("toast");
-
-    toast.classList.add("show");
-
-    setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-    },2500);
-
-}
-
-const params = new URLSearchParams(window.location.search);
-
-const WEBAPP = "https://script.google.com/macros/s/AKfycbwfz-rbBxKY-uPOkTvTCl7lLLIemCh-_eqSfP4oXADE18s1CpjfpPqbeTZX6rJk5Pjwag/exec";
-
-async function loadTicket() {
-
-    const slug = params.get("to");
-
-    if (!slug) return;
-
-    const res = await fetch(
-        `${WEBAPP}?action=ticket&to=${encodeURIComponent(slug)}`
-    );
-
-    const data = await res.json();
-
-    console.log(data);
-
-    if (!data.status) return;
-
-document.getElementById("ticket").style.display = "block";
-
-document.getElementById("ticketguestName").innerText = data.name;
-
-document.getElementById("guestStatus").innerText = data.checkin_status || "Belum Hadir";
-
-document.getElementById("guestTime").innerText = data.checkin_time || "-";
-
-document.getElementById("qrImage").src = data.qr_image;
-}
-
-//====================================
-// GOOGLE CALENDAR
-//====================================
-
-const eventTitle =
-"Wedding Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
-
-const eventLocation =
-"Gedung Serbaguna Anggun, Surabaya";
-
-const eventDescription =
-"Undangan Pernikahan Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
-
-// Tahun, Bulan(0-11), Tanggal, Jam, Menit
-const eventStart = new Date(2027,0,1,10,0,0);
-const eventEnd   = new Date(2027,0,1,15,0,0);
-
-function googleDate(date){
-
-    return date
-    .toISOString()
-    .replace(/[-:]/g,"")
-    .replace(/\.\d{3}/,"");
-
-}
-
-const calendarUrl =
-"https://calendar.google.com/calendar/render?action=TEMPLATE"+
-"&text="+encodeURIComponent(eventTitle)+
-"&dates="+googleDate(eventStart)+"/"+googleDate(eventEnd)+
-"&details="+encodeURIComponent(eventDescription)+
-"&location="+encodeURIComponent(eventLocation);
-
-document
-.getElementById("googleCalendarBtn")
-.href = calendarUrl;
-        
-    </script>
-    
-    <script src="js/api.js"></script>
-    <script src="js/rsvp.js"></script>
-    
-    <script>
-
-    window.addEventListener("DOMContentLoaded",()=>{
-
-    loadGuest();
-
-    loadTicket();
-
-});
-    </script>
-
-<a href="#eticket" class="floating-ticket">
-
-    <i class="fa-solid fa-qrcode"></i>
-
-    <span>E-Ticket QR</span>
-
-</a>
-</div>
-    
-    
-    <script>
-
-// ======================================
-// GUEST
-// ======================================
-
-const guestCode = params.get("to");
-
-async function loadGuest() {
-
-    if (!guestCode) return;
-
-    try {
-
-        const res = await fetch(
-    API_URL +
-    "?action=ticket&to=" +
-    encodeURIComponent(guestCode)
-);
-
-        const guest = await res.json();
-
-        if (guest.status) {
-
-            document.getElementById("coverguestName").innerText =
-                guest.name;
+            day.textContent = String(d).padStart(2, "0");
+            hour.textContent = String(h).padStart(2, "0");
+            minute.textContent = String(m).padStart(2, "0");
+            second.textContent = String(s).padStart(2, "0");
 
         }
 
-    } catch (err) {
+        updateCountdown();
 
-        console.error(err);
+        const timer = setInterval(updateCountdown, 1000);
+
+        // =======================================
+        // COPY REKENING
+        // =======================================
+
+        function copyRekening(id){
+
+            const nomor = document
+                .getElementById(id)
+                .innerText
+                .trim();
+
+            navigator.clipboard.writeText(nomor);
+
+            const toast = document.getElementById("toast");
+
+            toast.classList.add("show");
+
+            setTimeout(()=>{
+
+                toast.classList.remove("show");
+
+            },2500);
+
+        }
+
+        const params = new URLSearchParams(window.location.search);
+
+        const WEBAPP = "https://script.google.com/macros/s/AKfycbwfz-rbBxKY-uPOkTvTCl7lLLIemCh-_eqSfP4oXADE18s1CpjfpPqbeTZX6rJk5Pjwag/exec";
+
+        async function loadTicket() {
+
+            const slug = params.get("to");
+
+            if (!slug) return;
+
+            const res = await fetch(
+                `${WEBAPP}?action=ticket&to=${encodeURIComponent(slug)}`
+            );
+
+            const data = await res.json();
+
+            console.log(data);
+
+            if (!data.status) return;
+
+            document.getElementById("ticket").style.display = "block";
+
+            document.getElementById("ticketguestName").innerText = data.name;
+
+            document.getElementById("guestStatus").innerText = data.checkin_status || "Belum Hadir";
+
+            document.getElementById("guestTime").innerText = data.checkin_time || "-";
+
+            document.getElementById("qrImage").src = data.qr_image;
+        }
+
+        //====================================
+        // GOOGLE CALENDAR
+        //====================================
+
+        const eventTitle =
+        "Wedding Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
+
+        const eventLocation =
+        "Gedung Serbaguna Anggun, Surabaya";
+
+        const eventDescription =
+        "Undangan Pernikahan Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
+
+        // Tahun, Bulan(0-11), Tanggal, Jam, Menit
+        const eventStart = new Date(2027,0,1,10,0,0);
+        const eventEnd   = new Date(2027,0,1,15,0,0);
+
+        function googleDate(date){
+
+            return date
+            .toISOString()
+            .replace(/[-:]/g,"")
+            .replace(/\.\d{3}/,"");
+
+        }
+
+        const calendarUrl =
+        "https://calendar.google.com/calendar/render?action=TEMPLATE"+
+        "&text="+encodeURIComponent(eventTitle)+
+        "&dates="+googleDate(eventStart)+"/"+googleDate(eventEnd)+
+        "&details="+encodeURIComponent(eventDescription)+
+        "&location="+encodeURIComponent(eventLocation);
+
+        document
+        .getElementById("googleCalendarBtn")
+        .href = calendarUrl;
+
+        </script>
+
+        <script src="js/api.js"></script>
+        <script src="js/rsvp.js"></script>
+
+        <script>
+
+        window.addEventListener("DOMContentLoaded",()=>{
+
+            loadGuest();
+
+            loadTicket();
+
+        });
+
+        </script>
+
+        <a href="#eticket" class="floating-ticket">
+
+            <i class="fa-solid fa-qrcode"></i>
+
+            <span>E-Ticket QR</span>
+
+        </a>
+
+    </div>
+
+
+    <script>
+
+    // ======================================
+    // GUEST
+    // ======================================
+
+    const guestCode = params.get("to");
+
+    async function loadGuest() {
+
+        if (!guestCode) return;
+
+        try {
+
+            const res = await fetch(
+                API_URL +
+                "?action=ticket&to=" +
+                encodeURIComponent(guestCode)
+            );
+
+            const guest = await res.json();
+
+            if (guest.status) {
+
+                document.getElementById("coverguestName").innerText =
+                    guest.name;
+
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
 
     }
 
-}        
-        
-        const btn = document.getElementById("openInvitation");
+    // ======================================
+    // BUKA UNDANGAN
+    // ======================================
 
-const music = document.getElementById("bgMusic");
+    const btn = document.getElementById("openInvitation");
 
-const cover = document.querySelector(".cover");
+    const music = document.getElementById("bgMusic");
 
-const invitation =
-document.getElementById("invitationContent");
+    const cover = document.querySelector(".cover");
 
-btn.onclick = async ()=>{
+    const invitation =
+    document.getElementById("invitationContent");
 
-    await music.play();
+    btn.onclick = async ()=>{
 
-    cover.classList.add("hide");
+        try { await music.play(); } catch (e) { console.warn(e); }
 
-setTimeout(()=>{
+        cover.classList.add("hide");
 
-    cover.style.display="none";
+        setTimeout(()=>{
 
-    invitation.style.display="block";
+            cover.style.display="none";
 
-    invitation.classList.add("show");
+            invitation.style.display="block";
 
-},800);
+            requestAnimationFrame(()=>invitation.classList.add("show"));
 
-}
+        },800);
 
+    }
 
+    // ======================================
+    // ANIMASI MUNCUL SAAT SCROLL (.fade-up)
+    // ======================================
+
+    (function(){
+
+        const items = document.querySelectorAll(".fade-up");
+
+        if (!("IntersectionObserver" in window)) {
+            items.forEach(el => el.classList.add("visible"));
+            return;
+        }
+
+        const io = new IntersectionObserver((entries)=>{
+            entries.forEach(e=>{
+                if (e.isIntersecting) {
+                    e.target.classList.add("visible");
+                    io.unobserve(e.target);
+                }
+            });
+        },{threshold:.12});
+
+        items.forEach(el => io.observe(el));
+
+    })();
 
     </script>
 
 </body>
 
 </html>
-
-
-
