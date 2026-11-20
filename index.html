@@ -909,9 +909,11 @@ section[class^="inv-"]{padding:90px 0}
 
         }
 
+        var timer = setInterval(updateCountdown, 1000);
+
         updateCountdown();
 
-        const timer = setInterval(updateCountdown, 1000);
+        
 
         // =======================================
         // COPY REKENING
@@ -1035,100 +1037,90 @@ section[class^="inv-"]{padding:90px 0}
 
 
     <script>
+(function(){
 
     // ======================================
-    // GUEST
+    // BUKA UNDANGAN (berdiri sendiri, tidak bergantung script lain)
     // ======================================
-
-    const guestCode = params.get("to");
-
-    async function loadGuest() {
-
-        if (!guestCode) return;
-
-        try {
-
-            const res = await fetch(
-                API_URL +
-                "?action=ticket&to=" +
-                encodeURIComponent(guestCode)
-            );
-
-            const guest = await res.json();
-
-            if (guest.status) {
-
-                document.getElementById("coverguestName").innerText =
-                    guest.name;
-
-            }
-
-        } catch (err) {
-
-            console.error(err);
-
-        }
-
-    }
-
-    // ======================================
-    // BUKA UNDANGAN
-    // ======================================
-
     const btn = document.getElementById("openInvitation");
-
     const music = document.getElementById("bgMusic");
-
     const cover = document.querySelector(".cover");
+    const invitation = document.getElementById("invitationContent");
 
-    const invitation =
-    document.getElementById("invitationContent");
+    function openInvitation(){
 
-    btn.onclick = async ()=>{
+        if (cover.classList.contains("hide")) return;
 
-        try { await music.play(); } catch (e) { console.warn(e); }
+        // musik jangan di-await: kalau file lambat/tidak ada, undangan tetap terbuka
+        try {
+            const p = music.play();
+            if (p && p.catch) p.catch(err => console.warn("Musik tidak dapat diputar:", err));
+        } catch (err) {
+            console.warn(err);
+        }
 
         cover.classList.add("hide");
 
         setTimeout(()=>{
-
-            cover.style.display="none";
-
-            invitation.style.display="block";
-
+            cover.style.display = "none";
+            invitation.style.display = "block";
             requestAnimationFrame(()=>invitation.classList.add("show"));
-
+            window.scrollTo(0,0);
         },800);
-
     }
+
+    btn.addEventListener("click", openInvitation);
+
+    // ======================================
+    // GUEST (nama tamu di cover)
+    // ======================================
+    window.loadGuest = async function(){
+
+        const code = new URLSearchParams(window.location.search).get("to");
+
+        if (!code) return;
+
+        try {
+
+            const base = (typeof API_URL !== "undefined") ? API_URL : WEBAPP;
+
+            const res = await fetch(base + "?action=ticket&to=" + encodeURIComponent(code));
+
+            const guest = await res.json();
+
+            if (guest.status) {
+                document.getElementById("coverguestName").innerText = guest.name;
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+
+    };
 
     // ======================================
     // ANIMASI MUNCUL SAAT SCROLL (.fade-up)
     // ======================================
+    const items = document.querySelectorAll(".fade-up");
 
-    (function(){
+    if (!("IntersectionObserver" in window)) {
+        items.forEach(el => el.classList.add("visible"));
+        return;
+    }
 
-        const items = document.querySelectorAll(".fade-up");
+    const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+            if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                io.unobserve(e.target);
+            }
+        });
+    },{threshold:.12});
 
-        if (!("IntersectionObserver" in window)) {
-            items.forEach(el => el.classList.add("visible"));
-            return;
-        }
+    items.forEach(el => io.observe(el));
 
-        const io = new IntersectionObserver((entries)=>{
-            entries.forEach(e=>{
-                if (e.isIntersecting) {
-                    e.target.classList.add("visible");
-                    io.unobserve(e.target);
-                }
-            });
-        },{threshold:.12});
-
-        items.forEach(el => io.observe(el));
-
-    })();
-
-    </script>
+})();
+</script>
 
 </body>
 
