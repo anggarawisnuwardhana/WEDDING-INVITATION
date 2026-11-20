@@ -1,0 +1,936 @@
+const SHEET_URL =
+"https://docs.google.com/spreadsheets/d/15whtvCxRslZhsBm3e30FCZGo9oHtkE2S5i93qk9B-80/edit";
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+initExport();
+
+});
+
+function initExport(){
+
+    const qr=document.getElementById("btnExportQR");
+
+if(qr){
+
+    qr.onclick=exportQRZip;
+
+}
+const pdf=document.getElementById("btnPDFReport");
+
+if(pdf){
+
+    pdf.onclick=exportPDFReport;
+
+}
+
+const open=document.getElementById("btnOpenSheet");
+
+if(open){
+
+open.onclick=()=>{
+
+window.open(SHEET_URL,"_blank");
+
+};
+
+}
+
+const guest=document.getElementById("btnGuestExcel");
+
+if(guest){
+
+guest.onclick=exportGuestExcel;
+
+}
+
+const rsvp=document.getElementById("btnRSVPExcel");
+
+if(rsvp){
+
+rsvp.onclick=exportRSVPExcel;
+
+}
+
+}
+
+async function exportGuestExcel(){
+
+showLoading("Menyiapkan Excel...");
+
+try{
+
+const res=await fetch(API_URL+"?action=getGuests");
+
+const guests=await res.json();
+
+const workbook=new ExcelJS.Workbook();
+
+const sheet=workbook.addWorksheet("Guests");
+
+sheet.columns=[
+
+{header:"No",key:"no",width:10},
+
+{header:"Nama",key:"name",width:35},
+
+{header:"Link",key:"link",width:40},
+
+{header:"QR Code",key:"qr",width:20},
+
+{header:"Status",key:"status",width:18},
+
+{header:"Check In",key:"time",width:25}
+
+];
+
+guests.forEach((g,i)=>{
+
+sheet.addRow({
+
+no:i+1,
+
+name:g.name,
+
+link:
+"https://anggajuliani.github.io/INVITATION-PAGES/?to="+g.link,
+
+qr:g.qr,
+
+status:g.status,
+
+time:g.time
+
+});
+
+});
+
+sheet.getRow(1).font={bold:true};
+
+const buffer=
+await workbook.xlsx.writeBuffer();
+
+saveAs(
+
+new Blob([buffer]),
+
+"Guest_List.xlsx"
+
+);
+
+showToast("Guest Excel berhasil dibuat");
+
+}
+
+catch(e){
+
+console.log(e);
+
+showToast(
+
+"Gagal export",
+
+"#e74c3c"
+
+);
+
+}
+
+hideLoading();
+
+}
+
+async function exportRSVPExcel(){
+
+showLoading("Menyiapkan Excel...");
+
+try{
+
+const res=
+await fetch(API_URL+"?action=getRSVP");
+
+const rows=
+await res.json();
+
+const workbook=
+new ExcelJS.Workbook();
+
+const sheet=
+workbook.addWorksheet("RSVP");
+
+sheet.columns=[
+
+{header:"No",key:"no",width:10},
+
+{header:"Nama",key:"name",width:35},
+
+{header:"Ucapan",key:"message",width:70},
+
+{header:"Tanggal",key:"date",width:25}
+
+];
+
+rows.forEach((r,i)=>{
+
+sheet.addRow({
+
+no:i+1,
+
+name:r.name,
+
+message:r.message,
+
+date:r.date
+
+});
+
+});
+
+sheet.getRow(1).font={bold:true};
+
+const buffer=
+await workbook.xlsx.writeBuffer();
+
+saveAs(
+
+new Blob([buffer]),
+
+"RSVP_List.xlsx"
+
+);
+
+showToast("RSVP Excel berhasil dibuat");
+
+}
+
+catch(e){
+
+console.log(e);
+
+showToast(
+
+"Gagal export",
+
+"#e74c3c"
+
+);
+
+}
+
+hideLoading();
+
+}
+
+async function exportPDFReport(){
+
+showLoading("Membuat PDF...");
+
+try{
+
+const dashboard=
+await fetch(API_URL+"?action=dashboard");
+
+const dash=
+await dashboard.json();
+
+const guestReq=
+await fetch(API_URL+"?action=getGuests");
+
+const guests=
+await guestReq.json();
+
+const rsvpReq=
+await fetch(API_URL+"?action=getRSVP");
+
+const rsvp=
+await rsvpReq.json();
+
+const {jsPDF}=window.jspdf;
+
+const pdf=new jsPDF("p","mm","a4");
+
+let y=20;
+
+pdf.setFontSize(22);
+
+pdf.text(
+"Wedding Guest Report",
+105,
+y,
+{
+align:"center"
+}
+);
+
+y+=10;
+
+pdf.setFontSize(11);
+
+pdf.text(
+"Powered by Wedding Admin Dashboard",
+105,
+y,
+{
+align:"center"
+}
+);
+
+y+=15;
+
+pdf.setDrawColor(220);
+
+pdf.line(
+15,
+y,
+195,
+y
+);
+
+y+=10;
+
+pdf.setFontSize(15);
+
+pdf.text(
+"Summary",
+15,
+y
+);
+
+y+=10;
+
+pdf.setFontSize(11);
+
+pdf.text(
+"Total Guest : "+dash.totalGuest,
+20,
+y
+);
+
+y+=8;
+
+pdf.text(
+"Sudah Hadir : "+dash.totalPresent,
+20,
+y
+);
+
+y+=8;
+
+pdf.text(
+"Belum Hadir : "+dash.totalAbsent,
+20,
+y
+);
+
+y+=8;
+
+pdf.text(
+"Total RSVP : "+dash.totalRSVP,
+20,
+y
+);
+
+y+=15;
+
+  pdf.autoTable({
+
+startY:y,
+
+head:[[
+"No",
+"Nama",
+"QR",
+"Status",
+"Check In"
+]],
+
+body:
+
+guests.map((g,i)=>
+
+[
+
+i+1,
+
+g.name,
+
+g.qr,
+
+g.status,
+
+g.time||"-"
+
+]
+
+),
+
+theme:"grid",
+
+styles:{
+
+fontSize:8
+
+},
+
+headStyles:{
+
+fillColor:[52,152,219]
+
+}
+
+});
+
+  let nextY=
+pdf.lastAutoTable.finalY+15;
+
+pdf.setFontSize(15);
+
+pdf.text(
+
+"RSVP",
+
+15,
+
+nextY
+
+);
+
+nextY+=5;
+
+pdf.autoTable({
+
+startY:nextY,
+
+head:[[
+
+"No",
+
+"Nama",
+
+"Ucapan",
+
+"Tanggal"
+
+]],
+
+body:
+
+rsvp.map((r,i)=>
+
+[
+
+i+1,
+
+r.name,
+
+r.message,
+
+r.date
+
+]
+
+),
+
+styles:{
+
+fontSize:8
+
+},
+
+columnStyles:{
+
+2:{
+cellWidth:90
+}
+
+},
+
+headStyles:{
+
+fillColor:[39,174,96]
+
+}
+
+});
+
+  const page=
+
+pdf.internal.getNumberOfPages();
+
+for(let i=1;i<=page;i++){
+
+pdf.setPage(i);
+
+pdf.setFontSize(9);
+
+pdf.text(
+
+"Wedding Admin Dashboard",
+
+15,
+
+290
+
+);
+
+pdf.text(
+
+"Page "+i+" / "+page,
+
+180,
+
+290
+
+);
+
+}
+
+pdf.save(
+
+"Wedding_Report.pdf"
+
+);
+
+showToast(
+
+"PDF berhasil dibuat"
+
+);
+
+}
+
+catch(e){
+
+console.log(e);
+
+showToast(
+
+"Gagal membuat PDF",
+
+"#e74c3c"
+
+);
+
+}
+
+hideLoading();
+
+}
+
+async function exportQRZip(){
+
+    showLoading("Mengambil data tamu...");
+
+    try{
+
+        const res=await fetch(API_URL+"?action=getGuests");
+
+        const guests=await res.json();
+
+        if(!guests.length){
+
+            hideLoading();
+
+            showToast("Tidak ada data.");
+
+            return;
+
+        }
+
+        hideLoading();
+
+        showExportProgress();
+
+        await generateQRZip(guests);
+
+        hideExportProgress();
+        resetExportProgress();
+        document.title="Wedding Dashboard";
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        hideLoading();
+
+        hideExportProgress();
+document.title="Wedding Dashboard";
+        showToast("Export gagal","#e74c3c");
+
+    }
+
+}
+
+async function createGuestCard(guest){
+
+    return new Promise((resolve,reject)=>{
+
+        const canvas=document.createElement("canvas");
+
+        canvas.width=1000;
+        canvas.height=1200;
+
+        const ctx=canvas.getContext("2d");
+        ctx.imageSmoothingEnabled=true;
+
+ctx.imageSmoothingQuality="high";
+
+        // Background
+        ctx.fillStyle="#ffffff";
+        ctx.fillRect(0,0,1000,1200);
+
+        // Border
+        ctx.strokeStyle="#b8894b";
+
+ctx.lineWidth=5;
+
+ctx.strokeRect(
+
+40,
+
+40,
+
+920,
+
+1120
+
+);
+
+        // Title
+        ctx.fillStyle="#111";
+        ctx.font="bold 48px Arial";
+        ctx.textAlign="center";
+        ctx.fillText(
+    "Wedding Invitation",
+    500,
+    90
+);
+
+ctx.beginPath();
+
+ctx.moveTo(180,110);
+
+ctx.lineTo(820,110);
+
+ctx.strokeStyle="#d6c4a3";
+
+ctx.lineWidth=2;
+
+ctx.stroke();
+        // ==========================
+        // QR IMAGE
+        // ==========================
+
+        const qrImage=new Image();
+
+        qrImage.crossOrigin="Anonymous";
+
+        qrImage.onload=()=>{
+
+            ctx.drawImage(
+
+qrImage,
+
+220,
+
+160,
+
+560,
+
+560
+
+);
+
+            // Nama
+
+            ctx.fillStyle="#111";
+
+            ctx.font="bold 54px Arial";
+
+           let name=guest.name;
+
+if(name.length>30){
+
+    name=name.substring(0,30)+"...";
+
+}
+
+ctx.fillText(
+
+name,
+
+500,
+
+860
+
+);
+
+            // Guest Code
+
+            ctx.fillStyle="#666";
+
+            ctx.font="bold 42px Arial";
+
+ctx.fillStyle="#444";
+
+ctx.fillText(
+
+guest.qr.toUpperCase(),
+
+500,
+
+930
+
+);
+
+            // Footer
+
+            ctx.fillStyle="#999";
+
+            ctx.font="28px Arial";
+
+            ctx.fillText(
+                "Powered by Wedding Admin Dashboard",
+                500,
+                1110
+            );
+
+            resolve(canvas);
+
+        };
+
+        qrImage.onerror=()=>{
+
+            reject(
+                "QR gagal dibuat : "+guest.name
+            );
+
+        };
+
+        qrImage.src=
+
+        "https://quickchart.io/qr?size=800&margin=1&text="+
+
+        encodeURIComponent(guest.qr);
+
+    });
+
+}
+
+
+async function generateQRZip(guests){
+
+    const zip=new JSZip();
+
+    const folder=zip.folder("QR Code");
+
+    const total=guests.length;
+
+    for(let i=0;i<total;i++){
+
+        const guest=guests[i];
+
+        updateExportProgress(
+
+            i+1,
+
+            total,
+
+            guest
+
+        );
+
+        const canvas=
+
+            await createGuestCard(guest);
+
+        const blob=
+
+            await new Promise(resolve=>
+
+                canvas.toBlob(
+
+                    resolve,
+
+                    "image/png",
+
+                    1
+
+                )
+
+            );
+
+        const arrayBuffer=
+
+            await blob.arrayBuffer();
+
+        const safeName=
+
+            guest.name
+
+            .replace(/[\\/:*?"<>|]/g,"")
+
+            .trim();
+
+        folder.file(
+
+            guest.qr.toUpperCase()
+
+            +" - "+
+
+            safeName+
+
+            ".png",
+
+            arrayBuffer
+
+        );
+
+        await new Promise(r=>
+
+            requestAnimationFrame(r)
+
+        );
+
+    }
+
+    document.getElementById(
+
+        "progressText"
+
+    ).innerHTML=
+
+    "Mengompresi ZIP...";
+
+    document.getElementById(
+
+        "progressGuest"
+
+    ).innerHTML=
+
+    "Harap tunggu...";
+
+    const content=
+
+        await zip.generateAsync(
+
+            {
+
+                type:"blob",
+
+                compression:"DEFLATE",
+
+                compressionOptions:{
+
+                    level:6
+
+                }
+
+            }
+
+        );
+
+    saveAs(
+
+        content,
+
+        "Wedding_QR_Code.zip"
+
+    );
+
+    showToast(
+
+        "QR ZIP berhasil dibuat"
+
+    );
+
+}
+function showExportProgress(){
+
+document
+.getElementById("exportProgress")
+.classList.add("show");
+
+}
+
+function hideExportProgress(){
+
+document
+.getElementById("exportProgress")
+.classList.remove("show");
+
+}
+
+function updateExportProgress(
+
+current,
+
+total,
+
+guest
+
+){
+
+const percent=
+
+Math.round(
+
+(current/total)*100
+
+);
+
+document
+.getElementById("progressFill")
+.style.width=
+
+percent+"%";
+
+document
+.getElementById("progressPercent")
+.innerHTML=
+
+percent+"%";
+
+document
+.getElementById("progressGuest")
+.innerHTML=
+
+guest.name;
+
+document
+.getElementById("progressCount")
+.innerHTML=
+
+current+
+
+" / "+
+
+total;
+
+document
+.getElementById("progressText")
+.innerHTML=
+
+"Generating QR Code...";
+
+document.title=
+percent+"% - Export QR";
+
+}
+
+
+function resetExportProgress(){
+
+    document.getElementById("progressFill").style.width="0%";
+
+    document.getElementById("progressPercent").innerHTML="0%";
+
+    document.getElementById("progressGuest").innerHTML="-";
+
+    document.getElementById("progressCount").innerHTML="0 / 0";
+
+    document.getElementById("progressText").innerHTML="Menyiapkan...";
+
+}
