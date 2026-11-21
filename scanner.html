@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14261f">
+<title>QR Check-In DJATI Restu</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<style>
+:root{
+    --night:#14261f;--moss:#1f3a2e;--moss2:#2b4d3d;
+    --gold:#c9a15b;--gold2:#e6cf9f;
+    --ok:#5fd39a;--err:#ff7b6b;--wait:#f2c35c;
+    --serif:"Cormorant Garamond",Georgia,serif;--script:"Great Vibes",cursive;--sans:"Jost",system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
+body{
+    font-family:var(--sans);color:#fff;text-align:center;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(circle at 15% 0%,rgba(201,161,91,.22),transparent 45%),linear-gradient(170deg,#0e1c16,var(--moss) 60%,var(--night));
+    background-attachment:fixed;
+    padding:20px 16px calc(28px + env(safe-area-inset-bottom));
+}
+.wrap{max-width:520px;margin:0 auto}
+
+/* Header */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.back{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(201,161,91,.45);border-radius:50px;color:var(--gold2);font-size:.82rem;text-decoration:none;transition:background .2s}
+.back:hover{background:rgba(201,161,91,.15)}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;color:var(--gold2)}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+h2{font-family:var(--script);font-weight:400;font-size:2.6rem;line-height:1.3;color:var(--gold2);margin-top:8px}
+.sub{font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+
+/* Pilihan kamera */
+.camera-switch{display:inline-flex;gap:4px;margin:20px 0 16px;padding:4px;border:1px solid rgba(201,161,91,.4);border-radius:50px;background:rgba(255,255,255,.05)}
+.camera-switch button{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border:none;border-radius:50px;background:transparent;color:rgba(255,255,255,.75);font-family:inherit;font-size:.9rem;cursor:pointer;transition:background .2s,color .2s}
+.camera-switch button.active{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--night);font-weight:500}
+.camera-switch button:disabled{opacity:.6;cursor:wait}
+
+/* Scanner */
+.scan-frame{position:relative;padding:10px;border:1px solid rgba(201,161,91,.55);border-radius:22px;background:rgba(0,0,0,.35);box-shadow:0 24px 50px rgba(0,0,0,.4)}
+#reader{width:100%;max-width:500px;min-height:260px;margin:auto;overflow:hidden;border-radius:14px;background:#0a120e}
+#reader video{width:100%!important;display:block;object-fit:cover}
+#reader.front video{transform:scaleX(-1)}
+#reader img[alt="Info icon"]{display:none}
+.scan-frame::before,.scan-frame::after{content:"";position:absolute;width:34px;height:34px;pointer-events:none;z-index:2}
+.scan-frame::before{top:-2px;left:-2px;border-top:3px solid var(--gold);border-left:3px solid var(--gold);border-radius:22px 0 0 0}
+.scan-frame::after{bottom:-2px;right:-2px;border-bottom:3px solid var(--gold);border-right:3px solid var(--gold);border-radius:0 0 22px 0}
+
+/* Status */
+#result{display:inline-block;max-width:100%;margin-top:22px;padding:11px 24px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);font-size:1rem;word-break:break-word;transition:background .25s,color .25s}
+.success{color:var(--ok);border-color:rgba(95,211,154,.5)!important;background:rgba(95,211,154,.12)!important}
+.error{color:var(--err);border-color:rgba(255,123,107,.5)!important;background:rgba(255,123,107,.12)!important}
+.loading{color:var(--wait);border-color:rgba(242,195,92,.5)!important;background:rgba(242,195,92,.12)!important}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,14,10,.78);backdrop-filter:blur(4px)}
+.modal-box{width:100%;max-width:340px;padding:30px 26px;text-align:center;color:#22302a;background:#fff;border-radius:22px;box-shadow:0 30px 60px rgba(0,0,0,.45);animation:pop .22s ease}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.check{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#e3f3ea;color:#2f9e6e;font-size:1.9rem}
+.modal-box h2{font-family:var(--serif);font-weight:700;font-size:1.5rem;color:var(--moss);margin:0 0 12px}
+.modal-box p{margin:6px 0;color:#53625a;font-size:.95rem;word-break:break-word}
+.modal-box p b{color:#22302a}
+.modal-box button{margin-top:18px;padding:12px 34px;border:none;border-radius:50px;background:var(--moss);color:var(--gold2);font-family:inherit;font-size:1rem;cursor:pointer;transition:background .2s}
+.modal-box button:hover{background:var(--moss2)}
+.hidden{display:none}
+
+@media(max-width:380px){h2{font-size:2.2rem}.camera-switch button{padding:9px 14px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <div class="top">
+        <a class="back" href="admin.html">← Dashboard</a>
+        <span class="live">Realtime</span>
+    </div>
+
+    <h2>DJATI Restu QR Scanner</h2>
+    <p class="sub">Wedding Check-In</p>
+
+    <!-- Pilihan kamera -->
+    <div class="camera-switch" id="cameraSwitch">
+        <button type="button" id="camBack" data-mode="environment">📷 Kamera Belakang</button>
+        <button type="button" id="camFront" data-mode="user">🤳 Kamera Depan</button>
+    </div>
+
+    <div class="scan-frame">
+        <div id="reader"></div>
+    </div>
+
+    <div id="result">Silahkan Scan QR</div>
+
+</div>
+
+<audio id="beep">
+<source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg">
+</audio>
+
+<!-- ✅ MODAL HARUS DI LUAR SCRIPT -->
+<div id="scanModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="check">✓</div>
+    <h2>CHECK-IN BERHASIL</h2>
+    <p><b>Nama:</b> <span id="guestName"></span></p>
+    <p><b>Jam:</b> <span id="checkinTime"></span></p>
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+
+const WEBAPP="https://script.google.com/macros/s/AKfycbwfz-rbBxKY-uPOkTvTCl7lLLIemCh-_eqSfP4oXADE18s1CpjfpPqbeTZX6rJk5Pjwag/exec";
+
+/* ===== Pengaman anti dobel / spam ===== */
+const COOLDOWN_MS = 8000;      // QR yang sama diabaikan selama 8 detik
+const ERROR_UNLOCK_MS = 2500;  // jeda sebelum scan berikutnya setelah gagal
+const MODAL_AUTO_CLOSE_MS = 4000;
+const REQUEST_TIMEOUT_MS = 15000;
+
+let lastCode="";
+let scanning=true;             // false = sedang proses / modal terbuka
+const recent=new Map();        // kode -> waktu terakhir diproses
+let unlockTimer=null;
+let modalTimer=null;
+
+const result=document.getElementById("result");
+const beep=document.getElementById("beep");
+
+function playBeep(){
+beep.currentTime=0;
+const p=beep.play();
+if(p&&p.catch)p.catch(()=>{});
+}
+
+function showMessage(msg,cls){
+result.className=cls;
+result.textContent=msg;
+}
+
+function unlockScan(delay){
+clearTimeout(unlockTimer);
+unlockTimer=setTimeout(()=>{
+scanning=true;
+lastCode="";
+if(!result.classList.contains("loading")) showMessage("Silahkan Scan QR","");
+},delay);
+}
+
+/* ✅ MODAL */
+function showModal(name,time){
+document.getElementById("guestName").innerText=name;
+document.getElementById("checkinTime").innerText=time;
+document.getElementById("scanModal").classList.remove("hidden");
+clearTimeout(modalTimer);
+modalTimer=setTimeout(closeModal,MODAL_AUTO_CLOSE_MS);
+}
+
+function closeModal(){
+clearTimeout(modalTimer);
+const modal=document.getElementById("scanModal");
+if(modal.classList.contains("hidden"))return;
+modal.classList.add("hidden");
+unlockScan(600);   // scan dibuka lagi setelah modal ditutup
+}
+
+/* ✅ SEND DATA */
+async function sendCheckin(code){
+
+showMessage("Mengirim data...","loading");
+
+const ctl=new AbortController();
+const timeout=setTimeout(()=>ctl.abort(),REQUEST_TIMEOUT_MS);
+let modalOpened=false;
+
+try{
+
+const formData = new URLSearchParams();
+formData.append("action","checkin");
+formData.append("qr",code);
+
+const response = await fetch(WEBAPP,{
+    method:"POST",
+    body:formData,
+    signal:ctl.signal
+});
+
+if(!response.ok) throw new Error("HTTP "+response.status);
+
+const text=await response.text();
+
+let data;
+try{ data=JSON.parse(text); }
+catch(e){ throw new Error("Respons server tidak valid"); }
+
+playBeep();
+
+const now=new Date();
+const timeString=now.toLocaleString("id-ID",{
+dateStyle:"full",
+timeStyle:"medium"
+});
+
+if(data.status===true){
+
+// ambil nama dari server (WAJIB ada di backend kamu)
+const name = data.name || "Tamu";
+
+showMessage("✅ Check-in sukses","success");
+
+// tampilkan modal
+showModal(name,timeString);
+modalOpened=true;
+
+}else{
+showMessage("❌ "+(data.message||"Check-in gagal"),"error");
+}
+
+}catch(e){
+
+// request tidak selesai: izinkan scan ulang segera (server menolak bila sudah tercatat)
+recent.delete(code);
+
+showMessage(
+    e.name==="AbortError"
+    ? "Server Error: waktu habis, coba scan lagi"
+    : "Server Error: "+e.message,
+    "error"
+);
+
+}finally{
+
+clearTimeout(timeout);
+
+// bila sukses, scan dibuka saat modal ditutup; selain itu buka setelah jeda
+if(!modalOpened) unlockScan(ERROR_UNLOCK_MS);
+
+}
+
+}
+
+/* ✅ SCAN */
+function onScanSuccess(decodedText){
+
+const code=String(decodedText||"").trim();
+
+if(!scanning||!code)return;
+if(code===lastCode)return;
+
+// QR yang sama baru diproses lagi setelah cooldown
+const last=recent.get(code);
+if(last&&Date.now()-last<COOLDOWN_MS)return;
+
+lastCode=code;
+scanning=false;
+recent.set(code,Date.now());
+
+// bersihkan riwayat lama
+for(const [k,t] of recent){
+if(Date.now()-t>60000)recent.delete(k);
+}
+
+vibrateSuccess();
+
+sendCheckin(code);
+
+}
+
+function onScanFailure(error){}
+
+function showScanSuccess(guestName) {
+  const now = new Date();
+
+  const timeString = now.toLocaleString("id-ID", {
+    dateStyle: "full",
+    timeStyle: "medium"
+  });
+
+  document.getElementById("guestName").innerText = guestName;
+  document.getElementById("checkinTime").innerText = timeString;
+
+  document.getElementById("scanModal").classList.remove("hidden");
+}
+
+function vibrateSuccess(){
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
+  }
+}
+
+// unlock sekali
+document.addEventListener("click", () => {
+  if (navigator.vibrate) navigator.vibrate(50);
+}, { once: true });
+
+/* ===== Kamera depan / belakang ===== */
+const html5QrCode=new Html5Qrcode("reader");
+const reader=document.getElementById("reader");
+const camButtons=document.querySelectorAll("#cameraSwitch button");
+
+let cameraMode=localStorage.getItem("djatiCamera")==="user"?"user":"environment";
+let cameraBusy=false;
+
+function paintCameraUI(){
+camButtons.forEach(b=>{
+b.classList.toggle("active",b.dataset.mode===cameraMode);
+b.disabled=cameraBusy;
+});
+reader.classList.toggle("front",cameraMode==="user");
+}
+
+function qrboxSize(w,h){
+const s=Math.floor(Math.min(w,h)*0.7);
+return {width:s,height:s};
+}
+
+async function startCamera(){
+
+if(cameraBusy)return;
+
+cameraBusy=true;
+paintCameraUI();
+
+try{
+
+if(html5QrCode.isScanning) await html5QrCode.stop();
+
+await html5QrCode.start(
+{ facingMode:cameraMode },
+{ fps:10, qrbox:qrboxSize },
+onScanSuccess,
+onScanFailure
+);
+
+if(scanning) showMessage("Silahkan Scan QR","");
+
+}catch(e){
+
+showMessage("Kamera tidak dapat dibuka: "+(e&&e.message?e.message:e),"error");
+
+}finally{
+
+cameraBusy=false;
+paintCameraUI();
+
+}
+
+}
+
+camButtons.forEach(b=>{
+
+b.addEventListener("click",()=>{
+
+if(cameraBusy||b.dataset.mode===cameraMode)return;
+
+cameraMode=b.dataset.mode;
+
+try{ localStorage.setItem("djatiCamera",cameraMode); }catch(e){}
+
+startCamera();
+
+});
+
+});
+
+window.addEventListener("pagehide",()=>{
+if(html5QrCode.isScanning) html5QrCode.stop().catch(()=>{});
+});
+
+paintCameraUI();
+
+/* QR START */
+startCamera();
+
+</script>
+
+</body>
+</html>
