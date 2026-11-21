@@ -1,191 +1,280 @@
 /* ==========================================================
-   Wedding Admin Dashboard
-   admin.js
-   PART 1
+   Wedding Admin Dashboard - admin.js
+   - Tampil instan dari cache, sinkron otomatis di latar belakang
+   - Render hanya saat data berubah, semua teks di-escape
+   - Kompatibel dengan import.js & export.js
 ========================================================== */
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwfz-rbBxKY-uPOkTvTCl7lLLIemCh-_eqSfP4oXADE18s1CpjfpPqbeTZX6rJk5Pjwag/exec";
 
-/*
-GANTI URL DI ATAS
-dengan URL Web Apps milik Anda
-*/
+/* GANTI URL DI ATAS dengan URL Web Apps milik Anda */
 
-document.addEventListener("DOMContentLoaded", () => {
+const INVITE_BASE = "https://anggajuliani.github.io/INVITATION-PAGES/?to=";
+const SYNC_INTERVAL = 15000;   // sinkron otomatis tiap 15 detik
 
-    initDashboard();
+let guestData = [];
+let excelData = [];
+let importData = [];
+let duplicateData = [];
+let commentData = [];
 
-});
+let guestQuery = "";
+let syncing = false;
+const lastSig = { guest:"", comment:"" };
 
-async function initDashboard(){
+/* ==========================================================
+   Helper
+========================================================== */
 
-    initSidebar();
+const $ = id => document.getElementById(id);
 
-    initQuickAction();
-initGuestButtons();
-   initAddGuest();
-   initImport();
-   initDropArea();
+function esc(s){
+    return String(s ?? "").replace(/[&<>"']/g,c=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+}
+
+if(typeof window.normalizeName !== "function"){
+    window.normalizeName = n =>
+        String(n || "").toLowerCase().replace(/\s+/g," ").trim();
+}
+
+function cacheGet(k){
+    try{ return JSON.parse(localStorage.getItem(k)); }
+    catch(e){ return null; }
+}
+
+function cacheSet(k,v){
+    try{ localStorage.setItem(k,JSON.stringify(v)); }
+    catch(e){}
+}
+
+async function api(url,opt,timeout=15000){
+
+    const ctl = new AbortController();
+    const t = setTimeout(()=>ctl.abort(),timeout);
 
     try{
 
-        await withLoading(async()=>{
+        const res = await fetch(url,{...opt,signal:ctl.signal});
 
-            await Promise.all([
+        if(!res.ok) throw new Error("HTTP "+res.status);
 
-                loadDashboard(),
-                loadGuests()
-
-            ]);
-
-        },"Memuat Dashboard...");
+        return await res.json();
 
     }
-
-    catch(e){
-
-        console.error(e);
-
-    }
+    finally{ clearTimeout(t); }
 
 }
+
+const get  = q => api(API_URL+"?"+q+"&_="+Date.now());
+const post = b => api(API_URL,{method:"POST",body:JSON.stringify(b)});
+
 /* ==========================================================
-   Loading
+   Loading (hanya muncul bila proses > 250ms)
 ========================================================== */
+
+let loadTimer = null;
 
 function showLoading(text="Memproses..."){
 
-    const loading=document.getElementById("loading");
-
+    const loading = $("loading");
     if(!loading) return;
 
-    const txt=loading.querySelector(".loading-text");
+    const txt = loading.querySelector(".loading-text");
+    if(txt) txt.innerHTML = text;
 
-    if(txt){
-
-        txt.innerHTML=text;
-
-    }
-
-    loading.classList.add("show");
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(()=>loading.classList.add("show"),250);
 
 }
 
 function hideLoading(){
 
-    const loading=document.getElementById("loading");
+    clearTimeout(loadTimer);
 
-    if(!loading) return;
-
-    loading.classList.remove("show");
+    const loading = $("loading");
+    if(loading) loading.classList.remove("show");
 
 }
 
-async function withLoading(callback, text="Memproses..."){
+async function withLoading(callback,text="Memproses..."){
 
     showLoading(text);
 
-    try{
+    try{ return await callback(); }
+    finally{ hideLoading(); }
 
-        return await callback();
+}
 
+/* ==========================================================
+   Status sinkronisasi (indikator Live)
+========================================================== */
+
+function setSync(state){
+
+    const el = $("syncStatus");
+    if(!el) return;
+
+    el.className = "sync " + state;
+
+    const time = new Date().toLocaleTimeString("id-ID",
+        {hour:"2-digit",minute:"2-digit"});
+
+    el.querySelector("span").textContent =
+        state==="live" ? "Live · "+time :
+        state==="sync" ? "Menyinkronkan" : "Offline";
+
+}
+
+/* ==========================================================
+   Init
+========================================================== */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+    initDashboard();
+
+});
+
+function initDashboard(){
+
+    initSidebar();
+    initQuickAction();
+    initGuestButtons();
+    initAddGuest();
+    initGuestSearch();
+    initTableActions();
+    initComments();
+    initModals();
+
+    if(typeof initImport==="function") initImport();
+    if(typeof initDropArea==="function") initDropArea();
+
+    // tampilkan data terakhir secara instan
+    const g = cacheGet("dj_guests");
+
+    if(Array.isArray(g)){
+        guestData = g;
+        lastSig.guest = JSON.stringify(g);
+        renderGuestTable();
     }
 
+    const d = cacheGet("dj_dash");
+    if(d) applyDashboard(d);
+
+    // lalu segarkan di latar belakang
+    silentSync();
+
+    setInterval(()=>{
+
+        if(!document.hidden && navigator.onLine) silentSync();
+
+    },SYNC_INTERVAL);
+
+    document.addEventListener("visibilitychange",()=>{
+
+        if(!document.hidden) silentSync();
+
+    });
+
+    window.addEventListener("online",silentSync);
+
+}
+
+async function silentSync(){
+
+    if(syncing) return;
+
+    syncing = true;
+    setSync("sync");
+
+    try{
+
+        const tasks = [loadGuests(),loadDashboard()];
+
+        const rsvp = $("rsvpPage");
+
+        if(rsvp && rsvp.classList.contains("active")){
+            tasks.push(loadComments());
+        }
+
+        const r = await Promise.all(tasks);
+
+        setSync(r[0]===false ? "err" : "live");
+
+    }
+    catch(e){
+        setSync("err");
+    }
     finally{
-
-        hideLoading();
-
+        syncing = false;
     }
 
 }
+
 /* ==========================================================
    Sidebar
 ========================================================== */
 
+function closeSidebar(){
+
+    $("sidebar").classList.remove("active");
+    $("sidebarOverlay").classList.remove("show");
+
+}
+
 function initSidebar(){
 
-    const menuBtn=document.getElementById("menuBtn");
+    const menuBtn = $("menuBtn");
+    const sidebar = $("sidebar");
+    const overlay = $("sidebarOverlay");
 
-    const sidebar=document.getElementById("sidebar");
-
-    const overlay=document.getElementById("sidebarOverlay");
-
-    menuBtn.onclick=()=>{
+    menuBtn.onclick = ()=>{
 
         sidebar.classList.toggle("active");
-
         overlay.classList.toggle("show");
 
     };
 
-    overlay.onclick=()=>{
+    overlay.onclick = closeSidebar;
 
-        sidebar.classList.remove("active");
+    document.querySelectorAll(".menu li").forEach(menu=>{
 
-        overlay.classList.remove("show");
-
-    };
-
-    const menus=document.querySelectorAll(".menu li");
-
-    menus.forEach(menu=>{
-
-        menu.onclick=()=>{
+        menu.onclick = ()=>{
 
             if(menu.dataset.link){
-
-                location.href=menu.dataset.link;
-
+                location.href = menu.dataset.link;
                 return;
-
             }
-
-            menus.forEach(m=>m.classList.remove("active"));
-
-            menu.classList.add("active");
 
             showPage(menu.dataset.page);
 
-            if(window.innerWidth<=900){
-
-                sidebar.classList.remove("active");
-
-                overlay.classList.remove("show");
-
-            }
+            if(window.innerWidth<=900) closeSidebar();
 
         };
 
     });
 
 }
+
 /* ==========================================================
    Quick Action
 ========================================================== */
 
 function initQuickAction(){
 
-    document
-    .querySelectorAll(".quick-card")
-    .forEach(card=>{
+    document.querySelectorAll(".quick-card").forEach(card=>{
 
-        card.onclick=()=>{
+        card.onclick = ()=>{
 
             if(card.dataset.link){
-
-                location.href=
-                card.dataset.link;
-
+                location.href = card.dataset.link;
                 return;
-
             }
 
-            if(card.dataset.page){
-
-                showPage(card.dataset.page);
-
-            }
+            if(card.dataset.page) showPage(card.dataset.page);
 
         };
 
@@ -197,99 +286,53 @@ function initQuickAction(){
    Show Page
 ========================================================== */
 
+const PAGE_TITLE = {
+    dashboard:"Dashboard",
+    guest:"Data Tamu",
+    add:"Tambah Tamu",
+    search:"Cari Tamu",
+    import:"Import Excel",
+    rsvp:"RSVP",
+    export:"Export"
+};
+
 function showPage(page){
 
-    document
-    .querySelectorAll(".page")
-    .forEach(p=>{
+    const target = $(page+"Page");
 
-        p.classList.remove("active");
+    if(!target) return;
 
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    target.classList.add("active");
+
+    // sinkronkan menu sidebar (juga saat dipanggil dari Quick Action)
+    document.querySelectorAll(".menu li").forEach(li=>{
+        li.classList.toggle("active",li.dataset.page===page);
     });
 
-    const target =
-    document.getElementById(page+"Page");
+    const title = document.querySelector(".title");
+    if(title) title.innerHTML = PAGE_TITLE[page] || "Dashboard";
 
-    if(target){
+    window.scrollTo(0,0);
 
-        target.classList.add("active");
+    switch(page){
 
-    }
+        case "guest":
+            silentSync();
+        break;
 
-    const title =
-    document.querySelector(".title");
+        case "search":
+            renderGuestSearch();
+        break;
 
-    if(title){
+        case "import":
+            if(typeof initImport==="function") initImport();
+            if(typeof initDropArea==="function") initDropArea();
+        break;
 
-        switch(page){
-
-            case "dashboard":
-
-                title.innerHTML="Dashboard";
-
-            break;
-
-            case "guest":
-
-                title.innerHTML="Data Tamu";
-
-                if(typeof loadGuests==="function"){
-
-                    loadGuests();
-
-                }
-
-            break;
-
-            case "add":
-
-                title.innerHTML="Tambah Tamu";
-
-            break;
-
-            case "search":
-
-    title.innerHTML = "Cari Tamu";
-
-    if(guestData.length){
-
-        renderSearchList(guestData);
-
-    }
-
-break;
-
-              case "import":
-
-    title.innerHTML = "Import Excel";
-             if(typeof initImport==="function")
-        initImport();
-
-    if(typeof initDropArea==="function")
-        initDropArea();
-
-break;
-
-            case "rsvp":
-
-    title.innerHTML = "RSVP";
-
-    if(typeof loadComments === "function"){
-
-        loadComments();
-
-    }
-
-break;
-
-            case "export":
-
-                title.innerHTML="Export";
-
-            break;
-
-
-        }
+        case "rsvp":
+            loadComments();
+        break;
 
     }
 
@@ -299,52 +342,36 @@ break;
    Dashboard
 ========================================================== */
 
+function applyDashboard(d){
+
+    ["totalGuest","totalPresent","totalAbsent","totalRSVP"].forEach(k=>{
+
+        const el = $(k);
+        const v = String(d[k] ?? 0);
+
+        if(el && el.textContent!==v) el.textContent = v;
+
+    });
+
+}
+
 async function loadDashboard(){
 
     try{
 
-        const res =
-        await fetch(
+        const data = await get("action=dashboard");
 
-            API_URL+
-            "?action=dashboard"
+        if(!data || !data.status) return;
 
-        );
-
-        const data =
-        await res.json();
-
-        if(!data.status){
-
-            return;
-
-        }
-
-        document.getElementById("totalGuest")
-        .innerHTML=data.totalGuest;
-
-        document.getElementById("totalPresent")
-        .innerHTML=data.totalPresent;
-
-        document.getElementById("totalAbsent")
-        .innerHTML=data.totalAbsent;
-
-        document.getElementById("totalRSVP")
-        .innerHTML=data.totalRSVP;
+        applyDashboard(data);
+        cacheSet("dj_dash",data);
 
     }
-
     catch(err){
-
         console.error(err);
-
     }
 
 }
-
-/* ==========================================================
-   Refresh Dashboard
-========================================================== */
 
 async function refreshDashboard(){
 
@@ -353,364 +380,314 @@ async function refreshDashboard(){
 }
 
 /* ==========================================================
-   PART 2A
-   LOAD DATA TAMU
-========================================================== */
-
-let guestData = [];
-let excelData = [];
-let importData = [];
-let duplicateData = [];
-
-/* ==========================================================
-   LOAD GUESTS
+   Data Tamu
 ========================================================== */
 
 async function loadGuests(){
 
     try{
 
-        const tbody =
-            document.getElementById("guestTable");
+        const data = await get("action=getGuests");
 
-        if(tbody){
-
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align:center">
-                        Memuat data...
-                    </td>
-                </tr>
-            `;
-
+        if(!Array.isArray(data)){
+            throw new Error("Data guest tidak valid");
         }
 
-        const res =
-            await fetch(
-                API_URL + "?action=getGuests"
-            );
-       if(!res.ok){
+        setGuests(data);
 
-    throw new Error(
-        "HTTP "+res.status
-    );
-
-}
-
-        const data = await res.json();
-
-if(!Array.isArray(data)){
-    throw new Error("Data guest tidak valid");
-}
-
-guestData = data;
-
-renderGuestTable(data);
+        return true;
 
     }
     catch(err){
 
         console.error(err);
 
-        document.getElementById("guestTable").innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align:center;color:red">
-                    Gagal mengambil data
-                </td>
-            </tr>
-        `;
+        const tbody = $("guestTable");
+
+        if(!guestData.length && tbody){
+            tbody.innerHTML = `
+            <tr><td colspan="7" class="empty err">
+                Gagal mengambil data.
+                <a href="#" onclick="loadGuests();return false">Coba lagi</a>
+            </td></tr>`;
+        }
+
+        return false;
 
     }
 
 }
 
-/* ==========================================================
-   RENDER TABLE
-========================================================== */
+function setGuests(data){
+
+    const sig = JSON.stringify(data);
+
+    if(sig===lastSig.guest) return;   // tidak ada perubahan
+
+    lastSig.guest = sig;
+    guestData = data;
+
+    cacheSet("dj_guests",data);
+
+    renderGuestTable();
+
+    const sp = $("searchPage");
+    if(sp && sp.classList.contains("active")) renderGuestSearch();
+
+}
+
+function commitLocal(){
+
+    lastSig.guest = JSON.stringify(guestData);
+
+    cacheSet("dj_guests",guestData);
+
+    renderGuestTable();
+
+}
+
+function visibleGuests(){
+
+    const q = guestQuery.toLowerCase();
+
+    if(!q) return guestData;
+
+    return guestData.filter(g=>
+        [g.name,g.link,g.qr].some(v=>String(v||"").toLowerCase().includes(q))
+    );
+
+}
 
 function renderGuestTable(data){
 
-    const tbody = document.getElementById("guestTable");
+    const tbody = $("guestTable");
 
     if(!tbody) return;
 
-    tbody.innerHTML="";
+    const list = Array.isArray(data) ? data : visibleGuests();
 
-    if(data.length===0){
+    if(list.length===0){
 
-        tbody.innerHTML=`
-        <tr>
-            <td colspan="7" style="text-align:center">
-                Belum ada data tamu
-            </td>
-        </tr>
-        `;
+        tbody.innerHTML = `
+        <tr><td colspan="7" class="empty">
+            ${guestData.length ? "Tidak ada tamu yang cocok" : "Belum ada data tamu"}
+        </td></tr>`;
 
         return;
+
     }
 
-    data.forEach((guest,index)=>{
+    tbody.innerHTML = list.map((g,i)=>{
 
-        tbody.innerHTML += `
+        const link = INVITE_BASE + encodeURIComponent(g.link ?? "");
+        const done = g.status==="Sudah Hadir";
+
+        return `
         <tr>
-
-            <td>${index+1}</td>
-
-            <td>${guest.name}</td>
-
-            <td>
-    <a href="https://anggajuliani.github.io/INVITATION-PAGES/?to=${guest.link}"
-       target="_blank">
-       https://anggajuliani.github.io/INVITATION-PAGES/?to=${guest.link}
-    </a>
-</td>
-
-            <td>${guest.qr}</td>
-
-            <td>
-                <span class="${
-                    guest.status==="Sudah Hadir"
-                    ?"status-success"
-                    :"status-wait"
-                }">
-                    ${guest.status}
-                </span>
+            <td>${i+1}</td>
+            <td><strong>${esc(g.name)}</strong></td>
+            <td><a href="${esc(link)}" target="_blank" rel="noopener">${esc(link)}</a></td>
+            <td>${esc(g.qr)}</td>
+            <td><span class="${done?"status-success":"status-wait"}">${esc(g.status)}</span></td>
+            <td>${esc(g.time || "-")}</td>
+            <td class="actions">
+                <button class="delete-btn" data-act="del" data-id="${esc(g.id)}" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                <button class="reset-btn" data-act="reset" data-id="${esc(g.id)}" title="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+                <button class="btn-copy" data-act="copy" data-id="${esc(g.id)}" title="Salin Link"><i class="fa-solid fa-copy"></i></button>
+                <button class="btn-qr" data-act="qr" data-id="${esc(g.id)}" title="Preview QR"><i class="fa-solid fa-qrcode"></i></button>
             </td>
+        </tr>`;
 
-            <td>${guest.time || "-"}</td>
+    }).join("");
 
-            <td>
+}
 
-                <button
-    class="delete-btn"
-    data-id="${guest.id}"
-    data-name="${guest.name}"
-    title="Delete">
+function findGuest(id){
 
-    <i class="fa-solid fa-trash"></i>
+    return guestData.find(g=>String(g.id)===String(id));
 
-</button>
+}
 
-<button
-    class="reset-btn"
-    data-id="${guest.id}"
-    data-name="${guest.name}"
-    title="Reset">
+function initTableActions(){
 
-    <i class="fa-solid fa-rotate-left"></i>
+    const tbody = $("guestTable");
 
-</button>
+    if(!tbody) return;
 
-<button class="btn-copy"
-onclick="copyGuestLink('${guest.link}')">
+    tbody.addEventListener("click",e=>{
 
-<i class="fa-solid fa-copy"></i>
+        const btn = e.target.closest("button[data-act]");
 
-</button>
+        if(!btn) return;
 
-<button
-    class="btn-qr"
-    onclick="previewQR('${guest.qr}','${guest.name}')"
-    title="Preview QR">
+        const g = findGuest(btn.dataset.id);
 
-    <i class="fa-solid fa-qrcode"></i>
+        if(!g) return;
 
-</button>
-           
-</td>
+        switch(btn.dataset.act){
 
-        </tr>
-        `;
+            case "del":   deleteGuest(g.id,g.name);   break;
+            case "reset": resetCheckin(g.id,g.name);  break;
+            case "copy":  copyGuestLink(g.link);      break;
+            case "qr":    previewQR(g.qr,g.name);     break;
+
+        }
 
     });
 
-    
+    const refreshBtn = $("refreshGuest");
+
+    if(refreshBtn){
+
+        refreshBtn.onclick = async ()=>{
+
+            refreshBtn.disabled = true;
+
+            await silentSync();
+
+            refreshBtn.disabled = false;
+
+        };
+
+    }
 
 }
 
-document.addEventListener("click",(e)=>{
-
-    const del=e.target.closest(".delete-btn");
-
-    if(del){
-
-        deleteGuest(
-            del.dataset.id,
-            del.dataset.name
-        );
-
-        return;
-
-    }
-
-    const reset=e.target.closest(".reset-btn");
-
-    if(reset){
-
-        resetCheckin(
-            reset.dataset.id,
-            reset.dataset.name
-        );
-
-    }
-
-});
-
 /* ==========================================================
-   REFRESH
+   Pencarian di tabel Data Tamu
 ========================================================== */
 
-const refreshBtn = document.getElementById("refreshGuest");
+function initGuestSearch(){
 
-if(refreshBtn){
+    const input = $("searchGuest");
 
-    refreshBtn.onclick = ()=>{
+    if(input){
 
-        withLoading(async()=>{
+        input.addEventListener("input",()=>{
 
-            await loadGuests();
-            await loadDashboard();
+            guestQuery = input.value.trim();
 
-        },"Memuat Data...");
+            renderGuestTable();
 
-    };
+        });
+
+    }
+
+    const si = $("searchGuestInput");
+
+    if(si) si.addEventListener("input",renderGuestSearch);
+
+    const list = $("guestSearchList");
+
+    if(list){
+
+        list.addEventListener("click",e=>{
+
+            const item = e.target.closest(".guest-search-item");
+
+            if(!item) return;
+
+            const g = findGuest(item.dataset.id);
+
+            if(g) openGuestDetail(g);
+
+        });
+
+    }
 
 }
 
-
 /* ==========================================================
-   DELETE GUEST
+   Hapus / Reset (optimistic: UI langsung berubah)
 ========================================================== */
 
 async function deleteGuest(id,name){
 
-    const ok = await showConfirm({
-    type:"delete",
-    guestName:name
-});
+    const ok = await showConfirm({type:"delete",guestName:name});
 
     if(!ok) return;
 
-    await withLoading(async()=>{
+    const backup = guestData.slice();
 
-        const res = await fetch(API_URL,{
+    guestData = guestData.filter(g=>String(g.id)!==String(id));
+    commitLocal();
 
-            method:"POST",
+    try{
 
-            body:JSON.stringify({
+        const data = await post({action:"deleteGuest",id:id});
 
-                action:"deleteGuest",
+        if(!data.status) throw new Error(data.message || "Gagal");
 
-                id:id
+        showToast("✔ Data tamu berhasil dihapus");
 
-            })
+    }
+    catch(err){
 
-        });
+        console.error(err);
 
-        const data = await res.json();
+        guestData = backup;
+        commitLocal();
 
-        if(data.status){
+        showToast("Gagal menghapus data tamu.","#e74c3c");
 
-            showToast("✔ Data tamu berhasil dihapus");
+    }
 
-            await loadGuests();
-
-            await loadDashboard();
-
-        }
-
-        else{
-
-        }
-
-    },"Menghapus Data...");
+    silentSync();
 
 }
-/* ==========================================================
-   RESET CHECK IN
-========================================================== */
 
 async function resetCheckin(id,name){
 
-    const ok = await showConfirm({
-    type:"reset",
-    guestName:name
-});
+    const ok = await showConfirm({type:"reset",guestName:name});
 
     if(!ok) return;
 
-    await withLoading(async()=>{
+    const backup = guestData.map(g=>({...g}));
 
-        const res = await fetch(API_URL,{
+    guestData = guestData.map(g=>
+        String(g.id)===String(id) ? {...g,status:"Belum Hadir",time:""} : g
+    );
 
-            method:"POST",
+    commitLocal();
 
-            body:JSON.stringify({
+    try{
 
-                action:"resetCheckin",
+        const data = await post({action:"resetCheckin",id:id});
 
-                id:id
+        if(!data.status) throw new Error(data.message || "Gagal");
 
-            })
+        showToast("✔ Status Check In berhasil direset");
 
-        });
+    }
+    catch(err){
 
-        const data = await res.json();
+        console.error(err);
 
-        if(data.status){
+        guestData = backup;
+        commitLocal();
 
-            showToast("✔ Status Check In berhasil direset");
+        showToast("Gagal mereset status.","#e74c3c");
 
-            await loadGuests();
+    }
 
-            await loadDashboard();
-
-        }
-
-    },"Mereset Status...");
+    silentSync();
 
 }
+
 /* ==========================================================
-   SEARCH DATA TAMU
+   Toast
 ========================================================== */
-
-const searchGuest = document.getElementById("searchGuest");
-
-if(searchGuest){
-
-    searchGuest.addEventListener("keyup",()=>{
-
-        const keyword = searchGuest.value.toLowerCase();
-
-        const rows = document.querySelectorAll("#guestTable tr");
-
-        rows.forEach(row=>{
-
-            const text=(row.innerText||"").toLowerCase();
-
-            row.style.display =
-                text.includes(keyword)
-                ? ""
-                : "none";
-
-        });
-
-    });
-
-}
 
 let toastTimer = null;
 
-function showToast(text, color = "#27ae60"){
+function showToast(text,color="#2b4d3d"){
 
-    let toast = document.getElementById("globalToast");
+    let toast = $("globalToast");
 
     if(!toast){
 
         toast = document.createElement("div");
-
         toast.id = "globalToast";
-
         toast.className = "toast";
 
         document.body.appendChild(toast);
@@ -718,534 +695,435 @@ function showToast(text, color = "#27ae60"){
     }
 
     toast.classList.remove("show");
-
     toast.style.background = color;
+    toast.textContent = text;
 
-    toast.innerHTML = text;
+    clearTimeout(toastTimer);
 
-    if(toastTimer){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        toast.classList.add("show");
+    }));
 
-        clearTimeout(toastTimer);
-
-    }
-
-    requestAnimationFrame(()=>{
-
-        requestAnimationFrame(()=>{
-
-            toast.classList.add("show");
-
-        });
-
-    });
-
-    toastTimer = setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-    },2500);
+    toastTimer = setTimeout(()=>toast.classList.remove("show"),2500);
 
 }
+
+/* ==========================================================
+   Konfirmasi
+========================================================== */
 
 function showConfirm(options){
 
     return new Promise(resolve=>{
 
-        const modal=document.getElementById("confirmModal");
-        const title=document.getElementById("confirmTitle");
-        const subtitle=document.getElementById("confirmSubtitle");
-        const guest=document.getElementById("confirmGuest");
-        const btn=document.getElementById("btnConfirm");
+        const modal    = $("confirmModal");
+        const title    = $("confirmTitle");
+        const subtitle = $("confirmSubtitle");
+        const guest    = $("confirmGuest");
+        const btn      = $("btnConfirm");
 
-        // =========================
-        // DELETE
-        // =========================
         if(options.type==="delete"){
 
-            title.innerHTML="🗑️ Hapus Data Tamu";
-            subtitle.innerHTML="Data berikut akan dihapus secara permanen.";
-            btn.innerHTML="Hapus";
-            btn.className="confirm-btn delete";
-        }
+            title.innerHTML = "🗑️ Hapus Data Tamu";
+            subtitle.innerHTML = "Data berikut akan dihapus secara permanen.";
+            btn.innerHTML = "Hapus";
+            btn.className = "confirm-btn delete";
 
-        // =========================
-        // RESET
-        // =========================
+        }
         else if(options.type==="reset"){
 
-            title.innerHTML="🔄 Reset Check In";
-            subtitle.innerHTML="Status check in akan dikembalikan menjadi Belum Hadir.";
-            btn.innerHTML="Reset";
-            btn.className="confirm-btn reset";
-        }
+            title.innerHTML = "🔄 Reset Check In";
+            subtitle.innerHTML = "Status check in akan dikembalikan menjadi Belum Hadir.";
+            btn.innerHTML = "Reset";
+            btn.className = "confirm-btn reset";
 
-        // =========================
-        // IMPORT (INI YANG KAMU BUTUH)
-        // =========================
+        }
         else if(options.type==="import"){
 
-            title.innerHTML="📥 Import Data Excel";
+            title.innerHTML = "📥 Import Data Excel";
 
-            subtitle.innerHTML=`
-                Kamu akan mengimport <b>${options.total}</b> data.
-                ${options.duplicate ? `<br><span style="color:#e74c3c;">${options.duplicate} data duplikat akan dilewati</span>` : ""}
+            subtitle.innerHTML = `
+                Kamu akan mengimport <b>${esc(options.total)}</b> data.
+                ${options.duplicate ? `<br><span style="color:#c0392b;">${esc(options.duplicate)} data duplikat akan dilewati</span>` : ""}
             `;
 
-            btn.innerHTML="Import";
-            btn.className="confirm-btn import";
+            btn.innerHTML = "Import";
+            btn.className = "confirm-btn import";
+
+        }
+        else{
+
+            title.innerHTML = "Konfirmasi";
+            subtitle.innerHTML = "";
+            btn.innerHTML = "OK";
+            btn.className = "confirm-btn";
+
         }
 
-        // default fallback
-        else {
-            title.innerHTML="Konfirmasi";
-            subtitle.innerHTML="";
-            btn.innerHTML="OK";
-            btn.className="confirm-btn";
-        }
+        guest.innerHTML = esc(options.guestName || "-");
 
-        guest.innerHTML = options.guestName || "-";
+        const done = v=>{
+
+            modal.classList.remove("show");
+            modal.onclick = null;
+
+            resolve(v);
+
+        };
 
         modal.classList.add("show");
 
-        document.getElementById("btnCancel").onclick=()=>{
+        modal.onclick = e=>{ if(e.target===modal) done(false); };
 
-            modal.classList.remove("show");
-            resolve(false);
-        };
-
-        btn.onclick=()=>{
-
-            modal.classList.remove("show");
-            resolve(true);
-        };
+        $("btnCancel").onclick = ()=>done(false);
+        btn.onclick = ()=>done(true);
 
     });
 
 }
+
+/* ==========================================================
+   Link & QR
+========================================================== */
+
 function copyGuestLink(slug){
 
-    const fullLink =
-        "https://anggajuliani.github.io/INVITATION-PAGES/?to=" +
-        slug;
+    navigator.clipboard.writeText(INVITE_BASE+slug)
 
-    navigator.clipboard.writeText(fullLink).then(()=>{
+    .then(()=>showToast("Link berhasil disalin"))
 
-        showToast("Link berhasil disalin");
-
-    }).catch(()=>{
-
-        showToast("Gagal menyalin link");
-
-    });
+    .catch(()=>showToast("Gagal menyalin link","#e74c3c"));
 
 }
 
 function previewQR(code,name){
 
-    document.getElementById("previewQR").src =
-        "https://quickchart.io/qr?size=350&text=" +
-        encodeURIComponent(code);
+    $("previewQR").src =
+        "https://quickchart.io/qr?size=350&text="+encodeURIComponent(code);
 
-    document.getElementById("previewGuest").innerHTML =
-        name + "<br>" + code;
+    $("previewGuest").innerHTML = esc(name)+"<br>"+esc(code);
 
-    document
-        .getElementById("qrToast")
-        .classList.add("show");
+    $("qrToast").classList.add("show");
 
 }
 
 function closeQRToast(){
 
-    document
-        .getElementById("qrToast")
-        .classList.remove("show");
+    $("qrToast").classList.remove("show");
 
 }
 
+/* ==========================================================
+   Modal (QR, Detail Tamu) + tombol Escape
+========================================================== */
 
-const qrToast = document.getElementById("qrToast");
+function closeGuestDetail(){
 
-if(qrToast){
+    const m = $("guestDetailModal");
 
-    qrToast.addEventListener("click",(e)=>{
+    if(m) m.style.display = "none";
 
-        if(e.target===qrToast){
+}
 
-            closeQRToast();
+function initModals(){
 
+    const qr = $("qrToast");
+
+    if(qr){
+
+        qr.addEventListener("click",e=>{
+            if(e.target===qr) closeQRToast();
+        });
+
+    }
+
+    const detail = $("guestDetailModal");
+
+    if(detail){
+
+        detail.addEventListener("click",e=>{
+            if(e.target===detail) closeGuestDetail();
+        });
+
+    }
+
+    const closeBtn = $("closeGuestModal");
+
+    if(closeBtn) closeBtn.addEventListener("click",closeGuestDetail);
+
+    document.addEventListener("keydown",e=>{
+
+        if(e.key!=="Escape") return;
+
+        closeQRToast();
+        closeGuestDetail();
+
+        const c = $("confirmModal");
+
+        if(c && c.classList.contains("show")){
+            $("btnCancel").click();
         }
 
     });
 
 }
 
+/* ==========================================================
+   Tambah Tamu
+========================================================== */
 
 function initAddGuest(){
 
-    const btn=document.getElementById("btnAddGuest");
+    const btn = $("btnAddGuest");
 
-    if(!btn) return;
+    if(btn) btn.addEventListener("click",addGuest);
 
-    btn.addEventListener("click",addGuest);
+    const input = $("guestName");
+
+    if(input){
+
+        input.addEventListener("keydown",e=>{
+            if(e.key==="Enter") addGuest();
+        });
+
+    }
 
 }
 
 async function addGuest(){
 
-    const name=document
-        .getElementById("guestName")
-        .value
-        .trim();
+    const input = $("guestName");
+    const btn = $("btnAddGuest");
+
+    if(btn.disabled) return;
+
+    const name = input.value.trim();
 
     if(!name){
-
-        showToast("Masukkan nama tamu.");
-
+        showToast("Masukkan nama tamu.","#e74c3c");
         return;
-
     }
 
+    const key = normalizeName(name);
 
-   const key = normalizeName(name);
+    if(guestData.some(g=>normalizeName(g.name)===key)){
+        showToast("Nama tamu sudah ada.","#e74c3c");
+        return;
+    }
 
-const exists = guestData.some(g =>
-    normalizeName(g.name) === key
-);
-
-if(exists){
-
-    showToast(
-        "Nama tamu sudah ada.",
-        "#e74c3c"
-    );
-
-    return;
-}
-    const btn=document.getElementById("btnAddGuest");
-
-    btn.disabled=true;
-
-    btn.innerHTML="Menambahkan...";
+    btn.disabled = true;
+    btn.innerHTML = "Menambahkan...";
 
     try{
 
-        const res=await fetch(API_URL,{
-
-            method:"POST",
-
-            body:JSON.stringify({
-
-                action:"addGuest",
-
-                name:name
-
-            })
-
-        });
-
-        const data=await res.json();
+        const data = await post({action:"addGuest",name:name});
 
         if(data.status){
 
             showToast("Tamu berhasil ditambahkan");
 
-            document.getElementById("guestName").value="";
+            input.value = "";
 
-            await loadGuests();
+            await Promise.all([loadGuests(),loadDashboard()]);
 
-            await loadDashboard();
+        }
+        else{
 
-        }else{
+            showToast(data.message || "Gagal menambahkan tamu.","#e74c3c");
 
-            showToast(data.message, "#e74c3c");
         }
 
-    }catch(err){
+    }
+    catch(err){
 
         console.error(err);
 
-        showToast(
-    "Gagal menambahkan tamu.",
-    "#e74c3c"
-);
+        showToast("Gagal menambahkan tamu.","#e74c3c");
 
     }
 
-    btn.disabled=false;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-user-plus"></i><span>Tambah Tamu</span>';
 
-    btn.innerHTML="Tambah Tamu";
+}
+
+function initGuestButtons(){
+
+    const addBtn = document.querySelector(".add-btn");
+
+    if(addBtn) addBtn.addEventListener("click",()=>showPage("add"));
 
 }
 
 /* ==========================================================
-   DATA TAMU BUTTON
+   Cari Tamu
 ========================================================== */
-
-function initGuestButtons(){
-
-    const addBtn=document.querySelector(".add-btn");
-
-    if(addBtn){
-
-        addBtn.addEventListener("click",()=>{
-
-            // Pindah ke halaman Tambah Tamu
-            showPage("add");
-
-            // Sinkronkan menu sidebar
-            document
-                .querySelectorAll(".menu li")
-                .forEach(li=>li.classList.remove("active"));
-
-            const menu=document.querySelector(
-                '.menu li[data-page="add"]'
-            );
-
-            if(menu){
-
-                menu.classList.add("active");
-
-            }
-
-        });
-
-    }
-
-}
-
-const searchInput =
-document.getElementById("searchGuestInput");
-
-const searchList =
-document.getElementById("guestSearchList");
-
-if(searchInput){
-
-    searchInput.addEventListener(
-        "input",
-        renderGuestSearch
-    );
-
-}
 
 function renderGuestSearch(){
 
-const keyword=searchInput.value.toLowerCase().trim();
+    const input = $("searchGuestInput");
 
-const list = guestData.filter(g=>{
-    return (g.name || "")
-    .toLowerCase()
-    .includes(keyword);
-});
+    if(!input) return;
 
-renderSearchList(list);
+    const keyword = input.value.toLowerCase().trim();
+
+    renderSearchList(
+        guestData.filter(g=>(g.name||"").toLowerCase().includes(keyword))
+    );
 
 }
 
 function renderSearchList(list){
 
-    if(list.length === 0){
+    const box = $("guestSearchList");
 
-        searchList.innerHTML = `
-            <div style="padding:40px;text-align:center;color:#999;">
-                Tidak ada tamu ditemukan
-            </div>
-        `;
+    if(!box) return;
+
+    if(list.length===0){
+
+        box.innerHTML = `<div class="placeholder">Tidak ada tamu ditemukan</div>`;
+
         return;
+
     }
 
-    searchList.innerHTML = list.map((g,index)=>`
-        <div class="guest-search-item" data-index="${index}">
+    box.innerHTML = list.map(g=>`
+        <div class="guest-search-item" data-id="${esc(g.id)}">
             <div class="guest-left">
-                <div class="guest-avatar">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-
+                <div class="guest-avatar"><i class="fa-solid fa-user"></i></div>
                 <div>
-                    <div><strong>${g.name}</strong></div>
-                    <div class="guest-link">
-https://anggajuliani.github.io/INVITATION-PAGES/?to=${g.link}
-</div>
+                    <div><strong>${esc(g.name)}</strong></div>
+                    <div class="guest-link">${esc(INVITE_BASE + g.link)}</div>
                 </div>
             </div>
-
             <i class="fa-solid fa-chevron-right"></i>
         </div>
     `).join("");
-
-    document.querySelectorAll(".guest-search-item")
-    .forEach((item,index)=>{
-
-        item.addEventListener("click",()=>{
-
-            openGuestDetail(list[index]);
-
-        });
-
-    });
 
 }
 
 function openGuestDetail(g){
 
-const modal = document.getElementById("guestDetailModal");
+    const modal = $("guestDetailModal");
 
-if(!modal) return;
+    if(!modal) return;
 
-modal.style.display="flex";
+    const link = INVITE_BASE + g.link;
 
-document.getElementById("detailGuestName").innerHTML=g.name;
+    modal.style.display = "flex";
 
-document.getElementById("detailGuestQR").src =
-"https://quickchart.io/qr?size=300&text=" +
-encodeURIComponent(g.qr);
+    $("detailGuestName").textContent = g.name;
 
-document.getElementById("detailGuestLink").value =
-"https://anggajuliani.github.io/INVITATION-PAGES/?to=" +
-g.link;
+    $("detailGuestQR").src =
+        "https://quickchart.io/qr?size=300&text="+encodeURIComponent(g.qr);
 
-document.getElementById("copyGuestLinkBtn").onclick=()=>{
+    $("detailGuestLink").value = link;
 
-navigator.clipboard.writeText(
+    $("copyGuestLinkBtn").onclick = ()=>{
 
-"https://anggajuliani.github.io/INVITATION-PAGES/?to=" +
-g.link
-
-);
-
-showToast("Link berhasil disalin");
-
-};
-
-document.getElementById("openGuestBtn").onclick = () => {
-
-    window.open(
-        "https://anggajuliani.github.io/INVITATION-PAGES/?to=" + g.link,
-        "_blank"
-    );
-
-};
-const closeBtn =
-document.getElementById("closeGuestModal");
-
-if(closeBtn){
-
-    closeBtn.onclick=()=>{
-
-        document
-        .getElementById("guestDetailModal")
-        .style.display="none";
+        navigator.clipboard.writeText(link)
+        .then(()=>showToast("Link berhasil disalin"))
+        .catch(()=>showToast("Gagal menyalin link","#e74c3c"));
 
     };
 
+    $("openGuestBtn").onclick = ()=>window.open(link,"_blank","noopener");
+
 }
 
-};
-
-window.onclick=e=>{
-
-if(e.target.id=="guestDetailModal")
-
-document.getElementById("guestDetailModal").style.display="none";
-
-};
-
-let commentData = [];
+/* ==========================================================
+   RSVP & Ucapan
+========================================================== */
 
 async function loadComments(){
 
-    const res = await fetch(API_URL + "?action=adminComments");
+    try{
 
-    commentData = await res.json();
+        const data = await get("action=adminComments");
 
-    renderComments(commentData);
+        if(!Array.isArray(data)) throw new Error("Data RSVP tidak valid");
+
+        const sig = JSON.stringify(data);
+
+        if(sig===lastSig.comment) return;
+
+        lastSig.comment = sig;
+        commentData = data;
+
+        filterComments();
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        if(!commentData.length){
+
+            $("commentList").innerHTML =
+                `<div class="placeholder">Gagal memuat data RSVP.</div>`;
+
+        }
+
+    }
 
 }
 
 function renderComments(data){
 
-    const list = document.getElementById("commentList");
+    const list = $("commentList");
+
+    if(!list) return;
 
     if(data.length===0){
 
-        list.innerHTML=`
-        <div class="placeholder">
-            Belum ada ucapan.
-        </div>
-        `;
+        list.innerHTML = `<div class="placeholder">Belum ada ucapan.</div>`;
 
         return;
 
     }
 
-    list.innerHTML="";
-
-    data.forEach(item=>{
-
-        list.innerHTML+=`
-
+    list.innerHTML = data.map(item=>`
         <div class="comment-card">
-
             <div class="comment-header">
-
-                <div class="comment-name">
-                    👤 ${item.name}
-                </div>
-
-                <div class="comment-date">
-                    🕒 ${item.date}
-                </div>
-
+                <div class="comment-name">👤 ${esc(item.name)}</div>
+                <div class="comment-date">🕒 ${esc(item.date)}</div>
             </div>
-
-            <div class="comment-message">
-
-                ${item.message}
-
-            </div>
-
+            <div class="comment-message">${esc(item.message)}</div>
         </div>
-
-        `;
-
-    });
+    `).join("");
 
 }
 
-const searchComment = document.getElementById("searchComment");
+function filterComments(){
 
-if(searchComment){
+    const input = $("searchComment");
 
-    searchComment.addEventListener("input",()=>{
+    const keyword = input ? input.value.toLowerCase().trim() : "";
 
-        const keyword = searchComment.value
-            .toLowerCase()
-            .trim();
-
-        const result = commentData.filter(item=>{
-
-            return (
-                item.name.toLowerCase().includes(keyword) ||
-                item.message.toLowerCase().includes(keyword)
-            );
-
-        });
-
-        renderComments(result);
-
-    });
+    renderComments(commentData.filter(item=>
+        String(item.name||"").toLowerCase().includes(keyword) ||
+        String(item.message||"").toLowerCase().includes(keyword)
+    ));
 
 }
+
+function initComments(){
+
+    const input = $("searchComment");
+
+    if(input) input.addEventListener("input",filterComments);
+
+}
+
+/* ==========================================================
+   Konfirmasi Import (dipakai import.js)
+========================================================== */
 
 async function confirmImport(){
 
-    if(importRows.length===0){
+    if(typeof importRows==="undefined" || importRows.length===0){
 
-        showToast(
-            "Tidak ada data yang dapat diimport.",
-            "#e74c3c"
-        );
+        showToast("Tidak ada data yang dapat diimport.","#e74c3c");
 
         return;
 
@@ -1257,7 +1135,7 @@ async function confirmImport(){
 
         total:importRows.length,
 
-        duplicate:duplicateRows.length
+        duplicate:(typeof duplicateRows!=="undefined") ? duplicateRows.length : 0
 
     });
 
@@ -1269,11 +1147,8 @@ async function confirmImport(){
 
 history.replaceState(null,null,location.href);
 
-window.onpopstate=function(){
+window.onpopstate = function(){
 
-history.go(1);
+    history.go(1);
 
 };
-
-
-
