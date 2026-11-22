@@ -1,56 +1,68 @@
 /* ==========================================================
    IMPORT EXCEL
-   PART 1
+   (memakai helper dari admin.js: $, esc, showToast, showLoading,
+    hideLoading, showConfirm, loadGuests, loadDashboard, isOk, guestData)
 ========================================================== */
 
 let excelRows = [];
 let importRows = [];
 let duplicateRows = [];
+let importing = false;
+
+/* ==========================================================
+   INIT (aman dipanggil berulang: memakai onclick, bukan addEventListener)
+========================================================== */
 
 function initImport(){
 
-    const btn=document.getElementById("btnPreview");
+    const preview = $("btnPreview");
 
-    if(btn){
+    if(preview) preview.onclick = previewExcel;
 
-        btn.onclick=previewExcel;
-
-    }
-
-    const choose=document.getElementById("btnChooseExcel");
-
-    const input=document.getElementById("excelFile");
+    const choose = $("btnChooseExcel");
+    const input = $("excelFile");
 
     if(choose && input){
 
-        choose.onclick=()=>input.click();
+        choose.onclick = e=>{
+
+            e.stopPropagation();   // cegah dialog file terbuka dua kali
+
+            input.click();
+
+        };
 
     }
 
-    input.onchange=showSelectedFile;
+    if(input) input.onchange = showSelectedFile;
+
+    const reset = $("btnResetImport");
+
+    if(reset) reset.onclick = ()=>resetImport();
 
 }
 
 function showSelectedFile(){
 
-    const input=document.getElementById("excelFile");
+    const input = $("excelFile");
+    const info = $("selectedFile");
 
-    const info=document.getElementById("selectedFile");
+    if(!input || !info) return;
 
     if(!input.files.length){
 
-        info.innerHTML="Belum ada file dipilih";
+        info.innerHTML = "Belum ada file dipilih";
 
         return;
 
     }
 
-    const file=input.files[0];
+    const file = input.files[0];
 
-    info.innerHTML=`
+    info.innerHTML = `
         <i class="fa-solid fa-file-excel"></i>
 
-        <strong>${file.name}</strong>
+        <strong>${esc(file.name)}</strong>
 
         (${(file.size/1024).toFixed(1)} KB)
     `;
@@ -61,13 +73,13 @@ function showSelectedFile(){
    PREVIEW EXCEL
 ========================================================== */
 
-function previewExcel(){
+async function previewExcel(){
 
-    const input = document.getElementById("excelFile");
+    const input = $("excelFile");
 
     if(!input){
 
-        showToast("Input file tidak ditemukan.","#e74c3c");
+        showToast("Input file tidak ditemukan.","error");
 
         return;
 
@@ -75,7 +87,7 @@ function previewExcel(){
 
     if(input.files.length===0){
 
-        showToast("Silakan pilih file Excel.","#e74c3c");
+        showToast("Silakan pilih file Excel.","error");
 
         return;
 
@@ -83,50 +95,54 @@ function previewExcel(){
 
     const file = input.files[0];
 
-if(!/\.(xlsx|xls)$/i.test(file.name)){
-    showToast("File harus Excel (.xlsx / .xls)","#e74c3c");
-    return;
-}
+    if(!/\.(xlsx|xls)$/i.test(file.name)){
 
-showLoading("Membaca File Excel...");
+        showToast("File harus Excel (.xlsx / .xls)","error");
 
-const reader=new FileReader();
-
-reader.onload=function(e){
-
-    try{
-
-        readWorkbook(e.target.result);
-
-    }catch(err){
-
-        hideLoading();
-        console.error(err);
-        showToast("Format Excel tidak valid","#e74c3c");
+        return;
 
     }
 
-};
+    showLoading("Membaca File Excel...");
 
-reader.readAsArrayBuffer(file);
+    try{
+
+        const buffer = await file.arrayBuffer();
+
+        // ambil data tamu terbaru agar deteksi duplikat akurat
+        await loadGuests();
+
+        readWorkbook(buffer);
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        showToast("Format Excel tidak valid","error");
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
 }
+
 /* ==========================================================
    READ WORKBOOK
 ========================================================== */
 
 function readWorkbook(buffer){
 
-    const workbook = XLSX.read(buffer,{
-
-        type:"array"
-
-    });
+    const workbook = XLSX.read(buffer,{type:"array"});
 
     if(workbook.SheetNames.length===0){
 
         hideLoading();
 
-        showToast("Sheet kosong","#e74c3c");
+        showToast("Sheet kosong","error");
 
         return;
 
@@ -136,11 +152,7 @@ function readWorkbook(buffer){
 
     const sheet = workbook.Sheets[sheetName];
 
-    const rows = XLSX.utils.sheet_to_json(sheet,{
-
-        header:1
-
-    });
+    const rows = XLSX.utils.sheet_to_json(sheet,{header:1});
 
     processExcel(rows);
 
@@ -161,7 +173,9 @@ function processExcel(rows){
     if(rows.length===0){
 
         hideLoading();
-        showToast("Excel kosong","#e74c3c");
+
+        showToast("Excel kosong","error");
+
         return;
 
     }
@@ -171,7 +185,7 @@ function processExcel(rows){
         if(index===0) return;
         if(!row) return;
 
-        const name = String(row[0] || "").trim();
+        const name = String(row[0] ?? "").trim();
 
         if(name==="") return;
 
@@ -183,9 +197,7 @@ function processExcel(rows){
 
         const duplicate =
             already ||
-            guestData.some(g =>
-                normalizeName(g.name) === key
-            );
+            guestData.some(g=>normalizeName(g.name)===key);
 
         const item = {
 
@@ -203,7 +215,8 @@ function processExcel(rows){
 
             duplicateRows.push(item);
 
-        }else{
+        }
+        else{
 
             importRows.push(item);
 
@@ -215,7 +228,14 @@ function processExcel(rows){
 
     hideLoading();
 
+    if(excelRows.length===0){
+
+        showToast("Tidak ada nama pada kolom pertama Excel.","warn");
+
+    }
+
 }
+
 /* ==========================================================
    NORMALIZE
 ========================================================== */
@@ -242,11 +262,11 @@ function normalizeName(name){
 
 function updateImportSummary(){
 
-    const div = document.getElementById("importSummary");
+    const div = $("importSummary");
 
     if(!div) return;
 
-    div.innerHTML=`
+    div.innerHTML = `
 
         <div class="summary-card">
 
@@ -283,22 +303,18 @@ function updateImportSummary(){
 }
 
 /* ==========================================================
-   PREVIEW PLACEHOLDER
-========================================================== */
-
-/* ==========================================================
    RENDER IMPORT PREVIEW
 ========================================================== */
 
 function renderImportPreview(){
 
-    const div=document.getElementById("importPreview");
+    const div = $("importPreview");
 
     if(!div) return;
 
     if(excelRows.length===0){
 
-        div.innerHTML=`
+        div.innerHTML = `
         <div class="placeholder">
 
             Tidak ada data.
@@ -310,7 +326,7 @@ function renderImportPreview(){
 
     }
 
-    div.innerHTML=`
+    div.innerHTML = `
 
     <div class="import-toolbar">
 
@@ -367,51 +383,41 @@ function renderImportPreview(){
 
 function renderImportTable(data){
 
-    const tbody=document.getElementById("importTableBody");
+    const tbody = $("importTableBody");
 
     if(!tbody) return;
 
-    tbody.innerHTML="";
+    if(data.length===0){
 
-    data.forEach((item,index)=>{
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#6a796d">Tidak ada hasil</td></tr>`;
 
-        tbody.innerHTML+=`
+        return;
+
+    }
+
+    tbody.innerHTML = data.map((item,index)=>`
 
         <tr>
 
             <td>${index+1}</td>
 
-            <td>${item.name}</td>
+            <td>${esc(item.name)}</td>
 
             <td>
 
                 ${
                     item.duplicate
                     ?
-
-                    `<span class="badge-danger">
-
-                        Duplikat
-
-                    </span>`
-
+                    `<span class="badge-danger">Duplikat</span>`
                     :
-
-                    `<span class="badge-success">
-
-                        Baru
-
-                    </span>`
-
+                    `<span class="badge-success">Baru</span>`
                 }
 
             </td>
 
         </tr>
 
-        `;
-
-    });
+    `).join("");
 
 }
 
@@ -421,31 +427,19 @@ function renderImportTable(data){
 
 function initImportSearch(){
 
-    const input=document.getElementById("importSearch");
+    const input = $("importSearch");
 
     if(!input) return;
 
-    input.addEventListener("input",()=>{
+    input.oninput = ()=>{
 
-        const key=input.value
+        const key = input.value.trim().toLowerCase();
 
-        .trim()
+        renderImportTable(
+            excelRows.filter(x=>x.name.toLowerCase().includes(key))
+        );
 
-        .toLowerCase();
-
-        const result=excelRows.filter(x=>{
-
-            return x.name
-
-            .toLowerCase()
-
-            .includes(key);
-
-        });
-
-        renderImportTable(result);
-
-    });
+    };
 
 }
 
@@ -455,11 +449,11 @@ function initImportSearch(){
 
 function initImportButton(){
 
-    const btn=document.getElementById("btnImportExcel");
+    const btn = $("btnImportExcel");
 
     if(!btn) return;
 
-    btn.onclick=confirmImport;
+    btn.onclick = confirmImport;
 
 }
 
@@ -467,18 +461,13 @@ function initImportButton(){
    CONFIRM IMPORT
 ========================================================== */
 
-/* ==========================================================
-   CONFIRM IMPORT
-========================================================== */
-
 async function confirmImport(){
+
+    if(importing) return;
 
     if(importRows.length===0){
 
-        showToast(
-            "Tidak ada data yang dapat diimport.",
-            "#e74c3c"
-        );
+        showToast("Tidak ada data yang dapat diimport.","error");
 
         return;
 
@@ -499,100 +488,101 @@ async function confirmImport(){
     importGuests();
 
 }
+
 /* ==========================================================
    IMPORT DATA KE GOOGLE SHEET
 ========================================================== */
 
 async function importGuests(){
 
+    if(importing) return;
+
     if(importRows.length===0){
 
-        showToast("Tidak ada data untuk diimport","#e74c3c");
+        showToast("Tidak ada data untuk diimport","error");
 
         return;
 
     }
 
+    importing = true;
+
+    const count = importRows.length;
+
     try{
 
-        showLoading("Mengimport " + importRows.length + " tamu...");
+        showLoading("Mengimport "+count+" tamu...");
 
-        const btn=document.getElementById("btnImportExcel");
+        const btn = $("btnImportExcel");
 
         if(btn){
 
-            btn.disabled=true;
-            btn.innerHTML="Mengimport...";
+            btn.disabled = true;
+            btn.innerHTML = "Mengimport...";
+
         }
 
         const res = await fetch(API_URL,{
 
-    method:"POST",
+            method:"POST",
 
-    body:JSON.stringify({
+            body:JSON.stringify({
 
-        action:"importGuests",
+                action:"importGuests",
 
-        guests:importRows
+                guests:importRows
 
-    })
+            })
 
-});
+        });
 
-       if(!res.ok){
+        if(!res.ok){
 
-    throw new Error("HTTP " + res.status);
+            throw new Error("HTTP "+res.status);
 
-}
-
-const result = await res.json();
-        hideLoading();
-
-        if(btn){
-
-            btn.disabled=false;
-            btn.innerHTML="Import ke Google Sheet";
         }
 
-        if(!result.status){
+        const result = await res.json();
 
-            showToast(result.message || "Import gagal","#e74c3c");
+        if(!isOk(result)){
+
+            showToast(result.message || "Import gagal","error");
 
             return;
 
         }
 
-        showToast(
-
-            "✔ Berhasil mengimport " +
-
-            result.total +
-
-            " tamu."
-
-        );
+        showToast("Berhasil mengimport "+(result.total ?? count)+" tamu.");
 
         resetImport(false);
 
-        await loadGuests();
-
-        await loadDashboard();
+        await Promise.all([loadGuests(),loadDashboard()]);
 
     }
-
     catch(err){
-
-        hideLoading();
 
         console.error(err);
 
-        showToast(
+        showToast("Gagal menghubungi server","error");
 
-            "Gagal menghubungi server",
+        // kemungkinan sebagian data sudah masuk: segarkan daftar tamu
+        loadGuests();
 
-            "#e74c3c"
+    }
+    finally{
 
-        );
+        hideLoading();
+
+        importing = false;
+
+        const btn = $("btnImportExcel");
+
+        if(btn){
+
+            btn.disabled = false;
+            btn.innerHTML = "Import ke Google Sheet";
+
+        }
 
     }
 
@@ -604,82 +594,85 @@ const result = await res.json();
 
 function resetImport(showMessage = true){
 
-    excelRows=[];
+    excelRows = [];
+    importRows = [];
+    duplicateRows = [];
 
-    importRows=[];
+    const input = $("excelFile");
+    if(input) input.value = "";
 
-    duplicateRows=[];
+    const info = $("selectedFile");
+    if(info) info.innerHTML = "Belum ada file dipilih";
 
-    document.getElementById("excelFile").value="";
+    const summary = $("importSummary");
+    if(summary) summary.innerHTML = "";
 
-    document.getElementById("selectedFile").innerHTML=
-    "Belum ada file dipilih";
+    const progress = $("importProgress");
+    if(progress) progress.style.display = "none";
 
-    document.getElementById("importSummary").innerHTML="";
+    const preview = $("importPreview");
 
-    document.getElementById("importProgress").style.display="none";
+    if(preview){
 
-    document.getElementById("importPreview").innerHTML=`
-        <div class="placeholder">
-            Silakan pilih file Excel.
-        </div>
-    `;
+        preview.innerHTML = `
+            <div class="placeholder">
+                Silakan pilih file Excel.
+            </div>
+        `;
+
+    }
 
     if(showMessage){
+
         showToast("File berhasil direset");
+
     }
+
 }
+
+/* ==========================================================
+   DRAG & DROP
+========================================================== */
 
 function initDropArea(){
 
-    const box=document.getElementById("dropArea");
-
-    const input=document.getElementById("excelFile");
+    const box = $("dropArea");
+    const input = $("excelFile");
 
     if(!box || !input) return;
 
-    box.onclick=(e)=>{
+    box.onclick = e=>{
 
-        if(e.target.tagName!=="BUTTON"){
+        if(e.target===input || e.target.closest("button")) return;
 
-            input.click();
-
-        }
+        input.click();
 
     };
 
-    box.addEventListener("dragover",(e)=>{
+    box.ondragover = e=>{
 
         e.preventDefault();
 
         box.classList.add("drag");
 
-    });
+    };
 
-    box.addEventListener("dragleave",()=>{
+    box.ondragleave = ()=>box.classList.remove("drag");
 
-        box.classList.remove("drag");
-
-    });
-
-    box.addEventListener("drop",(e)=>{
+    box.ondrop = e=>{
 
         e.preventDefault();
 
         box.classList.remove("drag");
 
-        input.files=e.dataTransfer.files;
+        if(e.dataTransfer.files.length){
 
-        showSelectedFile();
+            input.files = e.dataTransfer.files;
 
-    });
+            showSelectedFile();
 
-}
+        }
 
-const reset=document.getElementById("btnResetImport");
-
-if(reset){
-
-    reset.onclick=resetImport;
+    };
 
 }
