@@ -171,6 +171,21 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
 #importPreview th{padding:12px 14px;text-align:left;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:#f8faf7;border-bottom:1px solid var(--line)}
 #importPreview td{padding:11px 14px;border-bottom:1px solid var(--line)}
 
+/* Import: ringkasan, toolbar, tabel, badge */
+.summary-card{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.summary-item{padding:18px;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.summary-item h2{font-size:2rem;line-height:1}
+.summary-item span{font-size:.85rem;color:var(--muted)}
+.summary-item.success h2{color:var(--green)}.summary-item.danger h2{color:var(--red)}
+.import-toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.import-search{flex:1;min-width:200px;padding:11px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.import-search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,161,91,.2)}
+.import-table{width:100%;min-width:480px;border-collapse:collapse}
+.badge-success,.badge-danger{display:inline-block;padding:4px 12px;border-radius:50px;font-size:.76rem;font-weight:500}
+.badge-success{background:#e3f3ea;color:var(--green)}.badge-danger{background:#fbe3e0;color:var(--red)}
+.confirm-icon{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 14px;border-radius:50%;font-size:1.5rem}
+.confirm-icon.delete{background:#fbe3e0;color:var(--red)}.confirm-icon.reset{background:#faeedc;color:var(--amber)}.confirm-icon.import{background:#e3f3ea;color:var(--green)}
+
 /* RSVP */
 .page-header #searchComment{width:100%;max-width:340px}
 #commentList{display:flex;flex-direction:column;gap:12px}
@@ -220,14 +235,16 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
 #openGuestBtn{background:var(--moss);border-color:var(--moss);color:var(--gold2)}
 .progress-window{max-width:420px}
 .progress-icon{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 14px;border-radius:50% 50% 14px 14px;background:var(--goldbg);color:var(--gold);font-size:1.6rem}
-.progress-window #progressText{margin-bottom:18px}
+.progress-window #exportProgressText{margin-bottom:18px}
 .progress-percent{margin-top:12px;font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--moss)}
 .progress-guest{color:var(--muted);font-size:.85rem;word-break:break-word}
 .progress-count{display:inline-block;margin-top:8px;padding:4px 14px;border-radius:50px;background:#eef2ec;color:var(--muted);font-size:.8rem}
 
 /* Toast */
-.toast{position:fixed;left:50%;bottom:28px;z-index:6000;padding:13px 24px;border-radius:50px;color:#fff;font-weight:500;box-shadow:0 12px 30px rgba(10,20,15,.35);opacity:0;transform:translate(-50%,24px);pointer-events:none;transition:opacity .3s,transform .3s}
+.toast{position:fixed;left:50%;bottom:28px;z-index:6000;display:flex;align-items:center;gap:10px;max-width:90vw;padding:13px 24px;border-radius:50px;background:#2b4d3d;color:#fff;font-weight:500;box-shadow:0 12px 30px rgba(10,20,15,.35);opacity:0;transform:translate(-50%,24px);pointer-events:none;transition:opacity .3s,transform .3s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.success{background:#2b4d3d}.toast.success i{color:#8fe0b6}
+.toast.error{background:#c0392b}.toast.warn{background:#d98a2b}.toast.info{background:#3a7ca5}
 
 /* Responsive */
 @media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
@@ -700,10 +717,10 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
 
         <h2>Export QR Code</h2>
 
-        <p id="progressText">Menyiapkan...</p>
+        <p id="exportProgressText">Menyiapkan...</p>
 
         <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
+            <div id="exportProgressFill" class="progress-fill"></div>
         </div>
 
         <div id="progressPercent" class="progress-percent">0%</div>
