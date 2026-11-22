@@ -10,7 +10,36 @@ const API_URL =
 
 /* GANTI URL DI ATAS dengan URL Web Apps milik Anda */
 
-const INVITE_BASE = "https://anggajuliani.github.io/INVITATION-PAGES/?to=";
+const INVITE_BASE = "https://anggarawisnuwardhana.github.io/WEDDING-INVITATION/?to=";
+
+/* link undangan tamu (dipakai tabel, salin link, buka undangan, export) */
+function inviteLink(slug){
+    return INVITE_BASE + encodeURIComponent(slug ?? "");
+}
+
+/* respons server dianggap sukses bila status true / "true" / success */
+function isOk(d){
+    return !!d && (d.status===true || d.status==="true" || d.success===true);
+}
+
+/* status hadir (tahan terhadap variasi teks) */
+function isPresent(s){
+    return /^\s*(sudah\s*hadir|hadir|checked.?in)\s*$/i.test(String(s||""));
+}
+
+/* init import.js cukup sekali (mencegah listener & notifikasi dobel) */
+let importReady = false;
+
+function initImportOnce(){
+
+    if(importReady) return;
+
+    importReady = true;
+
+    if(typeof initImport==="function") initImport();
+    if(typeof initDropArea==="function") initDropArea();
+
+}
 const SYNC_INTERVAL = 15000;   // sinkron otomatis tiap 15 detik
 
 let guestData = [];
@@ -149,8 +178,7 @@ function initDashboard(){
     initComments();
     initModals();
 
-    if(typeof initImport==="function") initImport();
-    if(typeof initDropArea==="function") initDropArea();
+    initImportOnce();
 
     // tampilkan data terakhir secara instan
     const g = cacheGet("dj_guests");
@@ -326,8 +354,7 @@ function showPage(page){
         break;
 
         case "import":
-            if(typeof initImport==="function") initImport();
-            if(typeof initDropArea==="function") initDropArea();
+            initImportOnce();
         break;
 
         case "rsvp":
@@ -361,7 +388,7 @@ async function loadDashboard(){
 
         const data = await get("action=dashboard");
 
-        if(!data || !data.status) return;
+        if(!isOk(data)) return;
 
         applyDashboard(data);
         cacheSet("dj_dash",data);
@@ -479,8 +506,8 @@ function renderGuestTable(data){
 
     tbody.innerHTML = list.map((g,i)=>{
 
-        const link = INVITE_BASE + encodeURIComponent(g.link ?? "");
-        const done = g.status==="Sudah Hadir";
+        const link = inviteLink(g.link);
+        const done = isPresent(g.status);
 
         return `
         <tr>
@@ -616,7 +643,7 @@ async function deleteGuest(id,name){
 
         const data = await post({action:"deleteGuest",id:id});
 
-        if(!data.status) throw new Error(data.message || "Gagal");
+        if(!isOk(data)) throw new Error(data.message || "Gagal");
 
         showToast("✔ Data tamu berhasil dihapus");
 
@@ -654,7 +681,7 @@ async function resetCheckin(id,name){
 
         const data = await post({action:"resetCheckin",id:id});
 
-        if(!data.status) throw new Error(data.message || "Gagal");
+        if(!isOk(data)) throw new Error(data.message || "Gagal");
 
         showToast("✔ Status Check In berhasil direset");
 
@@ -680,7 +707,37 @@ async function resetCheckin(id,name){
 
 let toastTimer = null;
 
-function showToast(text,color="#2b4d3d"){
+/*
+  showToast(teks, jenis)
+  jenis: "success" | "error" | "warn" | "info"
+  (warna lama seperti "#e74c3c" tetap dikenali -> error)
+*/
+function showToast(text,type){
+
+    const s = String(text ?? "").trim();
+
+    let kind = "success";
+
+    if(["success","error","warn","info"].includes(type)){
+        kind = type;
+    }
+    else if(typeof type==="string" && /e74c3c|c0392b|d32f2f|ff5252|red/i.test(type)){
+        kind = "error";
+    }
+    else if(typeof type==="string" && /f39c12|e67e22|d98a2b|orange|amber/i.test(type)){
+        kind = "warn";
+    }
+
+    if(kind==="success" && /^(❌|✖|gagal|error)/i.test(s)) kind = "error";
+
+    const clean = s.replace(/^[\u2714\u2713\u2705\u274C\u2716\u26A0\uFE0F\s]+/u,"");
+
+    const icon = {
+        success:"fa-circle-check",
+        error:"fa-circle-xmark",
+        warn:"fa-triangle-exclamation",
+        info:"fa-circle-info"
+    }[kind];
 
     let toast = $("globalToast");
 
@@ -688,15 +745,14 @@ function showToast(text,color="#2b4d3d"){
 
         toast = document.createElement("div");
         toast.id = "globalToast";
-        toast.className = "toast";
 
         document.body.appendChild(toast);
 
     }
 
     toast.classList.remove("show");
-    toast.style.background = color;
-    toast.textContent = text;
+    toast.className = "toast " + kind;
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${esc(clean)}</span>`;
 
     clearTimeout(toastTimer);
 
@@ -704,7 +760,10 @@ function showToast(text,color="#2b4d3d"){
         toast.classList.add("show");
     }));
 
-    toastTimer = setTimeout(()=>toast.classList.remove("show"),2500);
+    toastTimer = setTimeout(
+        ()=>toast.classList.remove("show"),
+        kind==="success" ? 2500 : 4000
+    );
 
 }
 
@@ -721,10 +780,13 @@ function showConfirm(options){
         const subtitle = $("confirmSubtitle");
         const guest    = $("confirmGuest");
         const btn      = $("btnConfirm");
+        const icon     = $("confirmIcon");
 
         if(options.type==="delete"){
 
-            title.innerHTML = "🗑️ Hapus Data Tamu";
+            title.textContent = "Hapus Data Tamu";
+            icon.className = "confirm-icon delete";
+            icon.innerHTML = '<i class="fa-solid fa-trash"></i>';
             subtitle.innerHTML = "Data berikut akan dihapus secara permanen.";
             btn.innerHTML = "Hapus";
             btn.className = "confirm-btn delete";
@@ -732,7 +794,9 @@ function showConfirm(options){
         }
         else if(options.type==="reset"){
 
-            title.innerHTML = "🔄 Reset Check In";
+            title.textContent = "Reset Check In";
+            icon.className = "confirm-icon reset";
+            icon.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
             subtitle.innerHTML = "Status check in akan dikembalikan menjadi Belum Hadir.";
             btn.innerHTML = "Reset";
             btn.className = "confirm-btn reset";
@@ -740,7 +804,9 @@ function showConfirm(options){
         }
         else if(options.type==="import"){
 
-            title.innerHTML = "📥 Import Data Excel";
+            title.textContent = "Import Data Excel";
+            icon.className = "confirm-icon import";
+            icon.innerHTML = '<i class="fa-solid fa-file-import"></i>';
 
             subtitle.innerHTML = `
                 Kamu akan mengimport <b>${esc(options.total)}</b> data.
@@ -753,7 +819,9 @@ function showConfirm(options){
         }
         else{
 
-            title.innerHTML = "Konfirmasi";
+            title.textContent = "Konfirmasi";
+            icon.className = "confirm-icon import";
+            icon.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
             subtitle.innerHTML = "";
             btn.innerHTML = "OK";
             btn.className = "confirm-btn";
@@ -788,7 +856,7 @@ function showConfirm(options){
 
 function copyGuestLink(slug){
 
-    navigator.clipboard.writeText(INVITE_BASE+slug)
+    navigator.clipboard.writeText(inviteLink(slug))
 
     .then(()=>showToast("Link berhasil disalin"))
 
@@ -918,7 +986,7 @@ async function addGuest(){
 
         const data = await post({action:"addGuest",name:name});
 
-        if(data.status){
+        if(isOk(data)){
 
             showToast("Tamu berhasil ditambahkan");
 
@@ -993,7 +1061,7 @@ function renderSearchList(list){
                 <div class="guest-avatar"><i class="fa-solid fa-user"></i></div>
                 <div>
                     <div><strong>${esc(g.name)}</strong></div>
-                    <div class="guest-link">${esc(INVITE_BASE + g.link)}</div>
+                    <div class="guest-link">${esc(inviteLink(g.link))}</div>
                 </div>
             </div>
             <i class="fa-solid fa-chevron-right"></i>
@@ -1008,7 +1076,7 @@ function openGuestDetail(g){
 
     if(!modal) return;
 
-    const link = INVITE_BASE + g.link;
+    const link = inviteLink(g.link);
 
     modal.style.display = "flex";
 
@@ -1115,35 +1183,7 @@ function initComments(){
 
 }
 
-/* ==========================================================
-   Konfirmasi Import (dipakai import.js)
-========================================================== */
-
-async function confirmImport(){
-
-    if(typeof importRows==="undefined" || importRows.length===0){
-
-        showToast("Tidak ada data yang dapat diimport.","#e74c3c");
-
-        return;
-
-    }
-
-    const ok = await showConfirm({
-
-        type:"import",
-
-        total:importRows.length,
-
-        duplicate:(typeof duplicateRows!=="undefined") ? duplicateRows.length : 0
-
-    });
-
-    if(!ok) return;
-
-    importGuests();
-
-}
+/* confirmImport() ada di import.js */
 
 history.replaceState(null,null,location.href);
 
