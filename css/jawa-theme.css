@@ -1,0 +1,98 @@
+/* ===== TEMA TRADISIONAL JAWA: hijau + putih + coklat sogan + emas ===== */
+:root{
+  --night:#16271e;--moss:#22392b;--moss2:#33503c;--moss-2:#33503c;
+  --gold:#c9a15b;--gold2:#ecd6a4;--gold-soft:#ecd6a4;
+  --sogan:#6b4428;--sogan2:#8a5a35;--kayu:#3e2a18;
+  --mist:#f5efe2;--paper:#fffdf8;--goldbg:#f4e8cf;--line:#e3d7bd;
+  --muted:#76705f;--ink:#2a2a1f;
+  --jv-tone:#e6cf9f;
+  --kawung:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64' fill='none' stroke='%23c9a15b' stroke-width='1'%3E%3Cellipse cx='16' cy='32' rx='14' ry='7'/%3E%3Cellipse cx='48' cy='32' rx='14' ry='7'/%3E%3Cellipse cx='32' cy='16' rx='7' ry='14'/%3E%3Cellipse cx='32' cy='48' rx='7' ry='14'/%3E%3Ccircle cx='32' cy='32' r='2' fill='%23c9a15b'/%3E%3C/svg%3E");
+}
+html:has(.sidebar){--jv-tone:#6b4428}
+html:has(.scan-frame){--jv-tone:#e6cf9f}
+
+/* ---------- Latar & lapisan dekoratif ---------- */
+body{background-color:var(--night)}
+html:has(.sidebar) body{background:var(--mist)}
+.jv-stage{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;perspective:1100px}
+.jv-batik{position:absolute;inset:0;background-image:var(--kawung);background-size:64px;opacity:.07}
+html:has(.sidebar) .jv-batik{opacity:.12;filter:sepia(.6)}
+.jv-glow{position:absolute;inset:0;background:
+  radial-gradient(circle at 50% 0%,rgba(201,161,91,.18),transparent 55%),
+  radial-gradient(circle at 50% 100%,rgba(107,68,40,.28),transparent 55%)}
+
+/* Gunungan / kayon: wayang 3D berayun */
+.jv-wayang{position:absolute;bottom:-2vh;height:min(74vh,640px);aspect-ratio:1/2;color:var(--jv-tone);opacity:.17;
+  transform-style:preserve-3d;filter:drop-shadow(0 0 14px rgba(201,161,91,.35))}
+.jv-wayang svg{width:100%;height:100%;display:block}
+.jv-wayang.l{left:1.5vw;transform-origin:50% 100%;animation:jvSwingL 9s ease-in-out infinite}
+.jv-wayang.r{right:1.5vw;transform-origin:50% 100%;animation:jvSwingR 9s ease-in-out infinite;animation-delay:-4.5s}
+@keyframes jvSwingL{0%,100%{transform:rotateY(-38deg) rotateZ(-2deg)}50%{transform:rotateY(38deg) rotateZ(2deg) translateY(-10px)}}
+@keyframes jvSwingR{0%,100%{transform:rotateY(38deg) rotateZ(2deg)}50%{transform:rotateY(-38deg) rotateZ(-2deg) translateY(-10px)}}
+
+/* Mandala kawung berputar 3D */
+.jv-ring{position:absolute;left:50%;bottom:-24vmin;width:80vmin;height:80vmin;margin-left:-40vmin;color:var(--jv-tone);opacity:.14;
+  transform:rotateX(68deg);transform-style:preserve-3d}
+.jv-ring svg{width:100%;height:100%;animation:jvSpin 60s linear infinite}
+@keyframes jvSpin{to{transform:rotate(360deg)}}
+
+/* Partikel emas */
+.jv-spark{position:absolute;width:8px;height:8px;background:var(--gold);opacity:0;transform:rotate(45deg);
+  animation:jvFloat linear infinite}
+@keyframes jvFloat{0%{opacity:0;transform:translate3d(0,0,0) rotate(45deg) scale(.4)}15%{opacity:.55}
+  100%{opacity:0;transform:translate3d(30px,-85vh,160px) rotate(405deg) scale(1)}}
+
+@media(max-width:700px){.jv-wayang{height:46vh;opacity:.11}.jv-wayang.l{left:-6vw}.jv-wayang.r{right:-6vw}}
+@media(prefers-reduced-motion:reduce){.jv-wayang,.jv-ring svg,.jv-spark{animation:none!important}}
+
+/* ---------- Efek tilt 3D ---------- */
+.jv-tilt{will-change:transform;transform-style:preserve-3d}
+
+/* ---------- Ornamen umum ---------- */
+.divider{background:linear-gradient(90deg,transparent,var(--gold),var(--sogan2),var(--gold),transparent)!important}
+h1,h2,h3{text-shadow:0 1px 0 rgba(255,255,255,.04)}
+::selection{background:var(--gold);color:var(--kayu)}
+
+/* ---------- INDEX (undangan) ---------- */
+.cover{background:radial-gradient(ellipse at top,rgba(201,161,91,.28),transparent 60%),
+  linear-gradient(170deg,#1a1109,#2b3a26 50%,#16271e)!important}
+.cover::before{border:2px solid rgba(201,161,91,.65)!important;border-image:none}
+.cover::after{border:1px dashed rgba(201,161,91,.4)!important;background-image:var(--kawung);background-size:64px;background-clip:padding-box}
+.cover .title,.inv-title,.inv-profile-name,.inv-event-title{background:linear-gradient(180deg,#f6e6bd,#c9a15b 70%,#a9783f);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.guest-box{border-radius:160px 160px 8px 8px!important;border-color:rgba(201,161,91,.7)!important;box-shadow:inset 0 0 30px rgba(107,68,40,.35),0 14px 30px rgba(0,0,0,.35)}
+.btn-open,.copy-btn,.floating-ticket{background:linear-gradient(135deg,#f0dcae,#c9a15b 60%,#a9783f)!important;box-shadow:0 10px 26px rgba(62,42,24,.5)}
+.inv-verse,.inv-countdown,.inv-ticket,.inv-rsvp{background:var(--mist) var(--kawung);background-size:auto,64px;background-blend-mode:normal}
+.inv-verse::before,.inv-countdown::before,.inv-ticket::before,.inv-rsvp::before{content:"";position:absolute;inset:0;background:rgba(245,239,226,.9);pointer-events:none}
+.inv-verse>*,.inv-countdown>*,.inv-ticket>*,.inv-rsvp>*{position:relative;z-index:1}
+.inv-prewed{background:linear-gradient(rgba(62,42,24,.55),rgba(22,39,30,.88)),radial-gradient(circle at 30% 30%,#4a3320,#16271e)!important}
+.inv-count-item{background:linear-gradient(170deg,var(--moss2),var(--kayu))!important;border:1px solid rgba(201,161,91,.5);color:var(--gold2)}
+.inv-event-card{background:linear-gradient(160deg,rgba(107,68,40,.35),rgba(22,39,30,.45))!important;border:1.5px solid rgba(201,161,91,.7)!important;box-shadow:0 24px 50px rgba(0,0,0,.4),inset 0 0 40px rgba(201,161,91,.08)}
+.inv-photo-frame{border:2px solid var(--gold)!important;background:linear-gradient(160deg,rgba(107,68,40,.5),rgba(22,39,30,.2));box-shadow:0 26px 50px rgba(0,0,0,.5),0 0 0 6px rgba(107,68,40,.35)}
+.gift-card,.eticket-card,.inv-map-box,.inv-gallery-item{border-color:rgba(201,161,91,.7)!important}
+.gift-card{background:linear-gradient(145deg,rgba(107,68,40,.3),rgba(22,39,30,.3))!important}
+.ticket-header,.calendar-btn,#sendRSVP,.comment-counter{background:linear-gradient(135deg,var(--sogan),var(--moss))!important;color:var(--gold2)!important}
+#comments>div,#comments .comment,#comments .comment-item,#comments .comment-card{border-left-color:var(--sogan2)!important;background:var(--paper)}
+
+/* ---------- ADMIN ---------- */
+.sidebar{background:linear-gradient(180deg,#2a1c10,#22392b 55%,#16271e)!important;border-right:2px solid rgba(201,161,91,.35)}
+.sidebar::before{content:"";position:absolute;inset:0;background-image:var(--kawung);background-size:64px;opacity:.07;pointer-events:none}
+.sidebar>*{position:relative}
+.logo i{background:linear-gradient(135deg,#f0dcae,#c9a15b 60%,#8a5a35)!important}
+.menu li.active{background:linear-gradient(90deg,rgba(201,161,91,.28),rgba(107,68,40,.15))!important}
+.topbar{background:rgba(255,253,248,.88)!important;border-bottom:2px solid var(--gold2)!important}
+.welcome{background:radial-gradient(circle at 90% 10%,rgba(201,161,91,.4),transparent 50%),linear-gradient(135deg,#2a1c10,#22392b 60%,#33503c)!important}
+.welcome::before{content:"";position:absolute;inset:0;background-image:var(--kawung);background-size:64px;opacity:.09;pointer-events:none}
+.welcome>*{position:relative;z-index:1}
+.card,.quick-card,.export-card,.table-wrapper,.search-card,.comment-card,.summary-item{background:var(--paper)!important;border-color:var(--line)!important;border-top:3px solid var(--gold)!important;box-shadow:0 1px 2px rgba(62,42,24,.06),0 12px 28px rgba(62,42,24,.1)!important}
+.add-btn,.add-guest-btn,.primary-btn,.choose-btn,.qr-close-btn,#openGuestBtn,.confirm-buttons .confirm-btn{background:linear-gradient(135deg,var(--sogan),var(--moss))!important;color:var(--gold2)!important}
+.guest-table th,#importPreview th{background:#f4ead6!important;color:var(--sogan)!important}
+.import-box{background:var(--paper)!important;border-color:var(--gold)!important}
+.icon,.export-card i,.progress-icon{background:linear-gradient(145deg,#f7ebd0,#ecd6a4)!important;color:var(--sogan)!important}
+.confirm-card,.guest-modal-content,.qrtoast-box,.progress-window{border-top:4px solid var(--gold)}
+
+/* ---------- SCANNER ---------- */
+.scan-frame{border:2px solid rgba(201,161,91,.7)!important;background:linear-gradient(160deg,rgba(107,68,40,.35),rgba(0,0,0,.45))!important}
+.camera-switch{border-color:rgba(201,161,91,.6)!important;background:rgba(107,68,40,.25)!important}
+.camera-switch button.active,.back:hover{background:linear-gradient(135deg,#f0dcae,#c9a15b 60%,#a9783f)!important;color:var(--kayu)!important}
+.modal-box{border-top:5px solid var(--gold)}
+.modal-box button{background:linear-gradient(135deg,var(--sogan),var(--moss))!important}
