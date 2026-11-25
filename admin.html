@@ -266,11 +266,194 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
     .search-card{padding:20px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* =========================================================
+   TEMA WAYANG  (hijau lumut + coklat kulit, siluet wayang)
+   Hanya menambah / menimpa warna & hiasan. Struktur & JS tetap.
+========================================================= */
+:root{
+    --mist:#f2ead6;--paper:#fffdf6;--line:#e2d6b8;--goldbg:#f6ecd2;
+    --leather:#5a3a22;--leather-d:#2e1c10;
+    --tatah-d:radial-gradient(circle,rgba(90,58,34,.13) 1.2px,transparent 1.7px) 0 0/18px 18px;
+    --tatah:radial-gradient(circle,rgba(230,207,159,.22) 1.2px,transparent 1.7px) 0 0/16px 16px;
+}
+body{background:var(--tatah-d),var(--mist)}
+.main{position:relative;z-index:1}
+
+/* siluet wayang di latar halaman */
+.wy-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wy-bg svg{position:absolute;filter:brightness(0);opacity:.05}
+.bg-gun{left:calc(260px + 2vw);bottom:-70px;height:62vh;aspect-ratio:200/310}
+.bg-pair{right:2vw;bottom:-30px;height:68vh;aspect-ratio:280/430}
+@media(max-width:900px){.bg-gun{left:-30px}.bg-pair{right:-40px}}
+
+/* sidebar */
+.sidebar{background:radial-gradient(ellipse at 50% 105%,rgba(123,80,48,.8),transparent 62%),var(--tatah),linear-gradient(180deg,#10201a,var(--moss) 68%,var(--night))}
+.sidebar .logo,.sidebar .menu{position:relative;z-index:1}
+.side-gun{position:absolute;left:50%;bottom:-6px;width:215px;aspect-ratio:200/310;transform:translateX(-50%);opacity:.22;pointer-events:none;z-index:0}
+.logo{border-bottom-color:rgba(201,161,91,.4)}
+.menu li.active{background:linear-gradient(90deg,rgba(201,161,91,.26),rgba(90,58,34,.32))}
+
+/* topbar */
+.topbar{background:rgba(255,253,246,.92);border-bottom:1px solid var(--gold)}
+
+/* banner selamat datang: Rama & Shinta + gunungan */
+.welcome{min-height:176px;background:radial-gradient(circle at 92% 8%,rgba(201,161,91,.38),transparent 52%),var(--tatah),linear-gradient(120deg,var(--night),var(--moss2) 55%,var(--leather))}
+.welcome h1,.welcome p{position:relative;z-index:2}
+.wy-welcome{position:absolute;right:18px;bottom:-10px;height:124%;aspect-ratio:280/430;z-index:1;pointer-events:none;filter:drop-shadow(0 0 16px rgba(201,161,91,.5))}
+.wy-gun-w{position:absolute;right:230px;top:-16px;height:140%;aspect-ratio:200/310;z-index:0;pointer-events:none;opacity:.22}
+@media(max-width:760px){.wy-gun-w{display:none}.wy-welcome{opacity:.3;right:-8px}}
+
+/* kartu & tabel */
+.cards .card{border-top:3px solid var(--gold)}
+.guest-table th,.placeholder,#importPreview th{background:#f8f1de}
+.guest-table tbody tr:hover{background:#fbf6e8}
+.import-box{background:var(--tatah-d),var(--paper);border-color:#d9c9a2}
+.import-box:hover,.import-box.dragover,.import-box.drag,.import-box.active{background:var(--goldbg)}
+.selected-file,.progress-count,.qr-close-icon,#closeGuestModal{background:#f1e8d0}
+.progress-bar{background:#eadfc4}
+.guest-modal-content input{background:#f8f1de}
+
+/* judul halaman berhias */
+.page-header h1,#importPage>h1,#exportPage>h1{position:relative;padding-bottom:10px}
+.page-header h1::after,#importPage>h1::after,#exportPage>h1::after{content:"";position:absolute;left:0;bottom:0;width:72px;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+
+/* modal */
+.confirm-card,.qrtoast-box,.guest-modal-content,.progress-window{border-top:4px solid var(--gold);background:var(--paper)}
 </style>
 
 </head>
 
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+            <linearGradient id="gGun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dc95"/><stop offset=".55" stop-color="#d4a94f"/><stop offset="1" stop-color="#a97a34"/></linearGradient>
+            <linearGradient id="gSkin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc95"/><stop offset="1" stop-color="#b98a3e"/></linearGradient>
+            <radialGradient id="gAura"><stop offset="0" stop-color="#e6cf9f" stop-opacity=".38"/><stop offset="1" stop-color="#e6cf9f" stop-opacity="0"/></radialGradient>
+            <pattern id="pdot" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#fff" fill-opacity=".85"/></pattern>
+            <pattern id="pdg" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r=".9" fill="#8c2b25" fill-opacity=".4"/></pattern>
+            <pattern id="pbat" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 12L12 0M-3 3L3 -3M9 15L15 9" stroke="#e6cf9f" stroke-width="1.3" stroke-opacity=".8"/></pattern>
+            <pattern id="pbd" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 12L12 0M-3 3L3 -3M9 15L15 9" stroke="#2e1c10" stroke-width="1.3" stroke-opacity=".75"/></pattern>
+
+            <!-- ========== GUNUNGAN (kayon) mengikuti bentuk wayang asli ========== -->
+            <symbol id="gun" viewBox="0 0 200 310">
+                <path id="gunO" d="M100 2L7 176Q3 186 10 196Q16 212 20 224Q22 236 24 248L36 290Q40 304 52 306H148Q160 304 164 290L176 248Q178 236 180 224Q184 212 190 196Q197 186 193 176Z"/>
+                <use href="#gunO" fill="url(#gGun)" stroke="#8c2b25" stroke-width="3"/>
+                <use href="#gunO" fill="url(#pdg)"/>
+                <use href="#gunO" transform="translate(100 156) scale(.93) translate(-100 -156)" fill="none" stroke="#c0463a" stroke-width="1.4"/>
+                <!-- pohon kehidupan -->
+                <g fill="none" stroke="#6b3a1a" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M100 126V34M100 102Q78 100 66 78M100 102Q122 100 134 78M100 80Q84 76 76 58M100 80Q116 76 124 58M100 58Q90 54 86 40M100 58Q110 54 114 40M100 34V14"/>
+                    <path d="M66 78Q56 70 58 60M134 78Q144 70 142 60M76 58Q68 52 70 44M124 58Q132 52 130 44"/>
+                </g>
+                <g fill="#c0463a"><circle cx="58" cy="60" r="2.4"/><circle cx="142" cy="60" r="2.4"/><circle cx="70" cy="44" r="2.2"/><circle cx="130" cy="44" r="2.2"/><circle cx="86" cy="40" r="2"/><circle cx="114" cy="40" r="2"/><circle cx="100" cy="12" r="2.6"/></g>
+                <!-- merak -->
+                <g fill="#2d6a6a" stroke="#6b3a1a" stroke-width=".8"><path d="M56 124Q58 98 80 102Q90 114 84 126Z"/><path d="M144 124Q142 98 120 102Q110 114 116 126Z"/></g>
+                <g fill="#f3dc95"><circle cx="70" cy="110" r="2"/><circle cx="78" cy="106" r="1.8"/><circle cx="130" cy="110" r="2"/><circle cx="122" cy="106" r="1.8"/></g>
+                <!-- kala / wajah -->
+                <path d="M83 136Q84 114 100 110Q116 114 117 136Q108 126 100 129Q92 126 83 136Z" fill="#c0463a" stroke="#6b3a1a" stroke-width=".8"/>
+                <circle cx="100" cy="138" r="11" fill="#e89a8c" stroke="#6b3a1a" stroke-width=".9"/>
+                <circle cx="96" cy="135" r="1.9" fill="#fff"/><circle cx="104" cy="135" r="1.9" fill="#fff"/>
+                <path d="M93 143Q100 150 107 143Q100 146 93 143Z" fill="#c0463a" stroke="#8c2b25" stroke-width=".8"/>
+                <path d="M96 149V166H104V149Z" fill="#d4a94f" stroke="#6b3a1a" stroke-width=".9"/>
+                <!-- harimau & banteng -->
+                <g stroke="#6b3a1a" stroke-width=".9"><ellipse cx="50" cy="162" rx="17" ry="6.5" fill="#e8924a"/><circle cx="67" cy="157" r="5" fill="#e8924a"/><ellipse cx="150" cy="162" rx="17" ry="6.5" fill="#2f3b4a"/><circle cx="133" cy="157" r="5.5" fill="#2f3b4a"/></g>
+                <path d="M42 157v10M48 156v11M54 156v11M40 168v7M60 168v7M133 150l-4-5M137 150l4-5" stroke="#3a2415" stroke-width="1.2" fill="none"/>
+                <path d="M146 168v7M158 168v7" stroke="#f4ecd2" stroke-width="1.6"/>
+                <!-- sayap & kepala garuda -->
+                <g fill="#7db26a" stroke="#6b3a1a" stroke-width=".8"><path d="M9 186Q26 172 50 186L44 212Q24 214 13 198Z"/><path d="M191 186Q174 172 150 186L156 212Q176 214 187 198Z"/></g>
+                <g fill="none" stroke="#c0463a" stroke-width="1"><path d="M13 190Q28 182 46 192M14 198Q30 190 44 200M17 206Q30 200 42 208"/><path d="M187 190Q172 182 154 192M186 198Q170 190 156 200M183 206Q170 200 158 208"/></g>
+                <g fill="#d4a94f" stroke="#6b3a1a" stroke-width=".9"><circle cx="58" cy="206" r="9"/><circle cx="142" cy="206" r="9"/></g>
+                <g fill="#fff"><circle cx="56" cy="204" r="2"/><circle cx="144" cy="204" r="2"/></g>
+                <path d="M64 210L76 216L66 218M136 210L124 216L134 218" fill="#c0463a" stroke="#6b3a1a" stroke-width=".7"/>
+                <!-- atap rumah -->
+                <path d="M100 176L68 226H132Z" fill="#a14034" stroke="#e6cf9f" stroke-width="1.2"/>
+                <path d="M100 176L84 226M100 176L116 226M88 202H112M80 214H120" stroke="#e6cf9f" stroke-width=".8" fill="none"/>
+                <!-- gerbang -->
+                <g fill="#f4ecd2" stroke="#6b3a1a" stroke-width=".8"><rect x="75" y="228" width="5" height="58"/><rect x="83" y="228" width="4" height="58"/><rect x="120" y="228" width="5" height="58"/><rect x="113" y="228" width="4" height="58"/></g>
+                <rect x="90" y="232" width="20" height="54" fill="#e8a24a" stroke="#6b3a1a"/>
+                <rect x="93" y="236" width="14" height="48" fill="#cfe3ea" stroke="#3a7ca5" stroke-width=".8"/>
+                <path d="M97 243h2v14h-2zM101 243h2v14h-2z" fill="#3a2415"/>
+                <path d="M86 286H114L126 306H74Z" fill="#c0463a" stroke="#6b3a1a" stroke-width=".8"/>
+                <path d="M80 296H120M92 286L88 306M100 286V306M108 286L112 306" stroke="#e6cf9f" stroke-width=".6" fill="none"/>
+                <!-- raksasa penjaga bergada & perisai -->
+                <g stroke="#6b3a1a" stroke-width=".8">
+                    <path d="M31 302L48 250" stroke="#3a4a46" stroke-width="5" stroke-linecap="round"/><path d="M169 302L152 250" stroke="#3a4a46" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="48" cy="266" r="6.5" fill="#e89a8c"/><circle cx="152" cy="266" r="6.5" fill="#e89a8c"/>
+                    <circle cx="52" cy="286" r="11" fill="#f3dc95"/><circle cx="148" cy="286" r="11" fill="#f3dc95"/>
+                </g>
+                <g fill="none" stroke="#2a1a10" stroke-width="2.6" stroke-linecap="round"><path d="M40 262Q44 252 56 258"/><path d="M160 262Q156 252 144 258"/></g>
+                <path d="M52 278L54 284L60 284L55 288L57 294L52 290L47 294L49 288L44 284L50 284ZM148 278L150 284L156 284L151 288L153 294L148 290L143 294L145 288L140 284L146 284Z" fill="#c0463a"/>
+                <g fill="none" stroke="#4a7a3a" stroke-width="1.3" stroke-linecap="round"><path d="M16 298Q28 292 38 298"/><path d="M184 298Q172 292 162 298"/></g>
+            </symbol>
+
+            <!-- ========== RAMA & SHINTA ========== -->
+            <g id="wyFace">
+                <path d="M122 70C122 60 134 54 143 59C151 63 152 73 158 81L178 92L161 96L165 103C163 109 157 111 151 109L147 118H124C126 104 122 88 122 70Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
+                <path d="M147 74Q153 70 159 75Q153 79 147 74Z" fill="#fff" stroke="#2e1c10" stroke-width=".8"/><circle cx="153" cy="75" r="1.6" fill="#2e1c10"/>
+                <path d="M163 100Q168 100 170 98" stroke="#b5342f" stroke-width="1.6" fill="none"/>
+            </g>
+            <g id="wyCore">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="112,160 84,240 96,328" stroke="#2e1c10" stroke-width="9"/><polyline points="112,160 84,240 96,328" stroke="url(#gSkin)" stroke-width="6"/>
+                    <polyline points="134,162 158,246 192,316" stroke="#2e1c10" stroke-width="9"/><polyline points="134,162 158,246 192,316" stroke="url(#gSkin)" stroke-width="6"/>
+                </g>
+                <g fill="#b5342f" stroke="#2e1c10" stroke-width="1"><circle cx="84" cy="240" r="5.5"/><circle cx="158" cy="246" r="5.5"/><circle cx="96" cy="326" r="5"/></g>
+                <path d="M192 316l16 4-7 3 10 4-14 1z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width=".8"/>
+                <path d="M92 330l-4 11 7 3 5-10z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width=".8"/>
+                <path d="M124 114H140L138 156H120Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1"/>
+                <path d="M104 336L108 380L92 392L150 396L156 386L132 382L128 336Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
+                <rect x="86" y="394" width="76" height="9" rx="3" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
+            </g>
+            <symbol id="rama-shinta" viewBox="70 -20 280 430">
+                <circle cx="210" cy="200" r="138" fill="url(#gAura)"/>
+                <!-- RAMA -->
+                <g transform="translate(6 0)">
+                    <use href="#wyCore"/>
+                    <path d="M116 92Q100 124 108 168" stroke="#dfe6e0" stroke-width="7" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
+                    <path d="M108 152H150L156 218H104Z" fill="#8c2b25" stroke="#2e1c10" stroke-width="1.2"/><path d="M108 152H150L156 218H104Z" fill="url(#pdot)"/>
+                    <path d="M114 160Q130 192 146 160" fill="none" stroke="#e6cf9f" stroke-width="3"/>
+                    <path d="M104 218H156L174 338H88Z" fill="#2d6a6a" stroke="#2e1c10" stroke-width="1.2"/><path d="M104 218H156L174 338H88Z" fill="url(#pbat)"/>
+                    <path d="M88 330H174L175 340H87Z" fill="#b5342f"/>
+                    <rect x="102" y="212" width="56" height="10" fill="url(#gSkin)" stroke="#2e1c10"/>
+                    <path d="M124 222L130 296L136 222Z" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
+                    <g transform="translate(134 116) scale(1.3) translate(-134 -116)">
+                    <use href="#wyFace"/>
+                    <path d="M114 66L118 42L126 48L132 22L140 44L148 32L152 62Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
+                    <path d="M122 60L126 48L132 34L138 48L146 60Z" fill="#2d6a6a" stroke="#2e1c10" stroke-width=".8"/><path d="M122 60L126 48L132 34L138 48L146 60Z" fill="url(#pdot)"/>
+                    <circle cx="132" cy="20" r="3" fill="#b5342f"/>
+                    <path d="M120 78C102 80 92 62 96 46C108 54 118 62 120 70Z" fill="#b5342f" stroke="#2e1c10" stroke-width="1"/>
+                    <path d="M96 46C88 36 98 28 106 34" stroke="#1d6fa5" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    </g>
+                </g>
+                <!-- SHINTA (cermin) -->
+                <g transform="translate(394 0) scale(-1 1)">
+                    <use href="#wyCore"/>
+                    <path d="M106 232Q70 270 66 330" stroke="#dfe6e0" stroke-width="7" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
+                    <path d="M104 230Q58 268 52 332Q72 324 88 312Z" fill="#1f2f3a" stroke="#2e1c10" stroke-width="1"/><path d="M104 230Q58 268 52 332Q72 324 88 312Z" fill="url(#pdot)"/>
+                    <path d="M108 152H150L156 218H104Z" fill="#1f2f3a" stroke="#2e1c10" stroke-width="1.2"/><path d="M108 152H150L156 218H104Z" fill="url(#pdot)"/>
+                    <path d="M114 160Q130 192 146 160" fill="none" stroke="#e6cf9f" stroke-width="3"/>
+                    <path d="M104 218H156L176 338H86Z" fill="#d4a94f" stroke="#2e1c10" stroke-width="1.2"/><path d="M104 218H156L176 338H86Z" fill="url(#pbd)"/>
+                    <path d="M86 330H176L177 340H85Z" fill="#b5342f"/>
+                    <rect x="102" y="212" width="56" height="10" fill="url(#gSkin)" stroke="#2e1c10"/>
+                    <g transform="translate(134 116) scale(1.3) translate(-134 -116)">
+                    <use href="#wyFace"/>
+                    <path d="M122 72C122 56 134 50 146 58C132 58 130 68 130 80L122 80Z" fill="#1f2f3a"/>
+                    <circle cx="114" cy="58" r="22" fill="#1d6fa5" stroke="#2e1c10" stroke-width="1.2"/>
+                    <path d="M114 58m-13 0a13 13 0 1 1 13 13a8 8 0 1 1-8-8a4 4 0 1 1 4 4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M122 78Q108 82 100 72Q108 66 120 70Z" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
+                    </g>
+                </g>
+            </symbol>
+    </defs>
+</svg>
+
+<!-- siluet wayang latar -->
+<div class="wy-bg" aria-hidden="true">
+    <svg class="bg-gun" viewBox="0 0 200 310"><use href="#gun"/></svg>
+    <svg class="bg-pair" viewBox="0 0 280 430"><use href="#rama-shinta"/></svg>
+</div>
 
 <!-- ================= Loading (hanya proses panjang) ================= -->
 
@@ -312,6 +495,8 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
 
     </ul>
 
+    <svg class="side-gun" viewBox="0 0 200 310" aria-hidden="true"><use href="#gun"/></svg>
+
 </aside>
 
 <main class="main">
@@ -337,6 +522,8 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,
 <section id="dashboardPage" class="page active">
 
     <div class="welcome">
+        <svg class="wy-gun-w" viewBox="0 0 200 310" aria-hidden="true"><use href="#gun"/></svg>
+        <svg class="wy-welcome" viewBox="0 0 280 430" aria-hidden="true"><use href="#rama-shinta"/></svg>
         <h1>Selamat Datang</h1>
         <p>Kelola seluruh tamu, RSVP, QR Code dan Check In melalui dashboard admin. Data diperbarui otomatis.</p>
     </div>
