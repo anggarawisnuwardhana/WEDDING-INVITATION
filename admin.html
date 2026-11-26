@@ -284,7 +284,7 @@ body{background:var(--tatah-d),var(--mist)}
 .wy-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .wy-bg svg{position:absolute;filter:brightness(0);opacity:.05}
 .bg-gun{left:calc(260px + 2vw);bottom:-70px;height:62vh;aspect-ratio:200/310}
-.bg-pair{right:2vw;bottom:-30px;height:68vh;aspect-ratio:280/430}
+.bg-pair{right:2vw;bottom:-30px;width:min(60vw,720px);aspect-ratio:820/740}
 @media(max-width:900px){.bg-gun{left:-30px}.bg-pair{right:-40px}}
 
 /* sidebar */
@@ -300,9 +300,10 @@ body{background:var(--tatah-d),var(--mist)}
 /* banner selamat datang: Rama & Shinta + gunungan */
 .welcome{min-height:176px;background:radial-gradient(circle at 92% 8%,rgba(201,161,91,.38),transparent 52%),var(--tatah),linear-gradient(120deg,var(--night),var(--moss2) 55%,var(--leather))}
 .welcome h1,.welcome p{position:relative;z-index:2}
-.wy-welcome{position:absolute;right:18px;bottom:-10px;height:124%;aspect-ratio:280/430;z-index:1;pointer-events:none;filter:drop-shadow(0 0 16px rgba(201,161,91,.5))}
+.wy-welcome{position:absolute;right:14px;bottom:-16px;height:132%;aspect-ratio:820/740;z-index:1;pointer-events:none;color:var(--gold);opacity:.24;filter:drop-shadow(0 0 14px rgba(201,161,91,.35));animation:breath 9s ease-in-out infinite}
+@keyframes breath{0%,100%{opacity:.18}50%{opacity:.28}}
 .wy-gun-w{position:absolute;right:230px;top:-16px;height:140%;aspect-ratio:200/310;z-index:0;pointer-events:none;opacity:.22}
-@media(max-width:760px){.wy-gun-w{display:none}.wy-welcome{opacity:.3;right:-8px}}
+@media(max-width:760px){.wy-gun-w{display:none}.wy-welcome{opacity:.16;right:-30px}}
 
 /* kartu & tabel */
 .cards .card{border-top:3px solid var(--gold)}
@@ -329,12 +330,7 @@ body{background:var(--tatah-d),var(--mist)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
             <linearGradient id="gGun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dc95"/><stop offset=".55" stop-color="#d4a94f"/><stop offset="1" stop-color="#a97a34"/></linearGradient>
-            <linearGradient id="gSkin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3dc95"/><stop offset="1" stop-color="#b98a3e"/></linearGradient>
-            <radialGradient id="gAura"><stop offset="0" stop-color="#e6cf9f" stop-opacity=".38"/><stop offset="1" stop-color="#e6cf9f" stop-opacity="0"/></radialGradient>
-            <pattern id="pdot" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#fff" fill-opacity=".85"/></pattern>
             <pattern id="pdg" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r=".9" fill="#8c2b25" fill-opacity=".4"/></pattern>
-            <pattern id="pbat" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 12L12 0M-3 3L3 -3M9 15L15 9" stroke="#e6cf9f" stroke-width="1.3" stroke-opacity=".8"/></pattern>
-            <pattern id="pbd" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 12L12 0M-3 3L3 -3M9 15L15 9" stroke="#2e1c10" stroke-width="1.3" stroke-opacity=".75"/></pattern>
 
             <!-- ========== GUNUNGAN (kayon) mengikuti bentuk wayang asli ========== -->
             <symbol id="gun" viewBox="0 0 200 310">
@@ -389,70 +385,15 @@ body{background:var(--tatah-d),var(--mist)}
             </symbol>
 
             <!-- ========== RAMA & SHINTA ========== -->
-            <g id="wyFace">
-                <path d="M122 70C122 60 134 54 143 59C151 63 152 73 158 81L178 92L161 96L165 103C163 109 157 111 151 109L147 118H124C126 104 122 88 122 70Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
-                <path d="M147 74Q153 70 159 75Q153 79 147 74Z" fill="#fff" stroke="#2e1c10" stroke-width=".8"/><circle cx="153" cy="75" r="1.6" fill="#2e1c10"/>
-                <path d="M163 100Q168 100 170 98" stroke="#b5342f" stroke-width="1.6" fill="none"/>
-            </g>
-            <g id="wyCore">
-                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="112,160 84,240 96,328" stroke="#2e1c10" stroke-width="9"/><polyline points="112,160 84,240 96,328" stroke="url(#gSkin)" stroke-width="6"/>
-                    <polyline points="134,162 158,246 192,316" stroke="#2e1c10" stroke-width="9"/><polyline points="134,162 158,246 192,316" stroke="url(#gSkin)" stroke-width="6"/>
-                </g>
-                <g fill="#b5342f" stroke="#2e1c10" stroke-width="1"><circle cx="84" cy="240" r="5.5"/><circle cx="158" cy="246" r="5.5"/><circle cx="96" cy="326" r="5"/></g>
-                <path d="M192 316l16 4-7 3 10 4-14 1z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width=".8"/>
-                <path d="M92 330l-4 11 7 3 5-10z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width=".8"/>
-                <path d="M124 114H140L138 156H120Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1"/>
-                <path d="M104 336L108 380L92 392L150 396L156 386L132 382L128 336Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
-                <rect x="86" y="394" width="76" height="9" rx="3" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
-            </g>
-            <symbol id="rama-shinta" viewBox="70 -20 280 430">
-                <circle cx="210" cy="200" r="138" fill="url(#gAura)"/>
-                <!-- RAMA -->
-                <g transform="translate(6 0)">
-                    <use href="#wyCore"/>
-                    <path d="M116 92Q100 124 108 168" stroke="#dfe6e0" stroke-width="7" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
-                    <path d="M108 152H150L156 218H104Z" fill="#8c2b25" stroke="#2e1c10" stroke-width="1.2"/><path d="M108 152H150L156 218H104Z" fill="url(#pdot)"/>
-                    <path d="M114 160Q130 192 146 160" fill="none" stroke="#e6cf9f" stroke-width="3"/>
-                    <path d="M104 218H156L174 338H88Z" fill="#2d6a6a" stroke="#2e1c10" stroke-width="1.2"/><path d="M104 218H156L174 338H88Z" fill="url(#pbat)"/>
-                    <path d="M88 330H174L175 340H87Z" fill="#b5342f"/>
-                    <rect x="102" y="212" width="56" height="10" fill="url(#gSkin)" stroke="#2e1c10"/>
-                    <path d="M124 222L130 296L136 222Z" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
-                    <g transform="translate(134 116) scale(1.3) translate(-134 -116)">
-                    <use href="#wyFace"/>
-                    <path d="M114 66L118 42L126 48L132 22L140 44L148 32L152 62Z" fill="url(#gSkin)" stroke="#2e1c10" stroke-width="1.2"/>
-                    <path d="M122 60L126 48L132 34L138 48L146 60Z" fill="#2d6a6a" stroke="#2e1c10" stroke-width=".8"/><path d="M122 60L126 48L132 34L138 48L146 60Z" fill="url(#pdot)"/>
-                    <circle cx="132" cy="20" r="3" fill="#b5342f"/>
-                    <path d="M120 78C102 80 92 62 96 46C108 54 118 62 120 70Z" fill="#b5342f" stroke="#2e1c10" stroke-width="1"/>
-                    <path d="M96 46C88 36 98 28 106 34" stroke="#1d6fa5" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    </g>
-                </g>
-                <!-- SHINTA (cermin) -->
-                <g transform="translate(394 0) scale(-1 1)">
-                    <use href="#wyCore"/>
-                    <path d="M106 232Q70 270 66 330" stroke="#dfe6e0" stroke-width="7" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
-                    <path d="M104 230Q58 268 52 332Q72 324 88 312Z" fill="#1f2f3a" stroke="#2e1c10" stroke-width="1"/><path d="M104 230Q58 268 52 332Q72 324 88 312Z" fill="url(#pdot)"/>
-                    <path d="M108 152H150L156 218H104Z" fill="#1f2f3a" stroke="#2e1c10" stroke-width="1.2"/><path d="M108 152H150L156 218H104Z" fill="url(#pdot)"/>
-                    <path d="M114 160Q130 192 146 160" fill="none" stroke="#e6cf9f" stroke-width="3"/>
-                    <path d="M104 218H156L176 338H86Z" fill="#d4a94f" stroke="#2e1c10" stroke-width="1.2"/><path d="M104 218H156L176 338H86Z" fill="url(#pbd)"/>
-                    <path d="M86 330H176L177 340H85Z" fill="#b5342f"/>
-                    <rect x="102" y="212" width="56" height="10" fill="url(#gSkin)" stroke="#2e1c10"/>
-                    <g transform="translate(134 116) scale(1.3) translate(-134 -116)">
-                    <use href="#wyFace"/>
-                    <path d="M122 72C122 56 134 50 146 58C132 58 130 68 130 80L122 80Z" fill="#1f2f3a"/>
-                    <circle cx="114" cy="58" r="22" fill="#1d6fa5" stroke="#2e1c10" stroke-width="1.2"/>
-                    <path d="M114 58m-13 0a13 13 0 1 1 13 13a8 8 0 1 1-8-8a4 4 0 1 1 4 4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
-                    <path d="M122 78Q108 82 100 72Q108 66 120 70Z" fill="#b5342f" stroke="#2e1c10" stroke-width=".8"/>
-                    </g>
-                </g>
-            </symbol>
+            <!-- siluet Rama & Shinta (di-trace dari foto wayang referensi) -->
+            <symbol id="sil-rs" viewBox="0 0 820 740"><path fill="currentColor" fill-rule="evenodd" d="M109 145L109 154L117 154L121 156L128 165L127 168L134 218L131 221L121 223L117 228L117 231L129 238L131 260L128 263L79 265L76 267L68 268L64 274L58 329L54 331L45 328L45 333L47 335L40 344L40 348L38 350L28 351L26 357L32 364L32 367L26 378L26 389L31 399L33 408L39 414L38 415L40 413L46 415L43 408L46 383L48 381L52 385L52 399L43 468L81 505L72 513L70 517L70 526L73 531L60 539L57 545L57 557L67 570L60 576L56 583L56 591L59 599L52 608L52 615L55 621L49 628L49 636L52 641L49 650L49 657L53 663L52 675L54 680L59 683L67 677L65 663L72 654L70 641L79 630L77 621L85 610L85 602L83 596L91 588L93 590L93 593L89 598L89 606L92 613L86 621L88 636L82 642L82 650L85 657L80 662L80 672L84 678L80 682L80 691L86 696L84 706L88 712L110 712L127 717L146 719L158 725L177 725L216 721L304 722L323 716L345 718L355 715L368 719L377 718L381 713L383 704L380 693L374 688L357 689L350 692L343 690L338 685L342 676L340 670L337 667L331 665L327 660L331 649L329 641L333 632L323 618L308 545L308 529L303 517L313 506L317 511L330 547L347 588L345 599L351 606L351 613L354 618L371 626L377 631L379 636L387 636L406 630L417 623L431 625L433 627L424 633L422 637L423 640L419 644L419 648L414 653L414 658L418 657L436 644L450 645L458 641L474 639L476 637L476 632L482 623L483 617L491 607L491 603L488 598L491 586L485 578L483 569L485 565L485 524L483 520L485 513L485 483L483 481L485 475L485 450L481 357L486 350L488 352L488 366L498 378L496 385L497 390L507 398L512 406L507 415L508 419L511 423L522 424L526 427L521 443L518 469L508 480L508 484L511 491L521 493L524 498L520 510L521 583L519 641L521 648L527 656L528 661L527 687L522 692L512 696L489 696L485 706L487 715L494 720L506 717L511 717L518 720L537 718L560 725L591 728L615 718L626 719L640 714L653 716L663 715L667 711L666 705L651 689L653 686L662 685L680 688L704 688L724 684L752 682L767 677L782 665L785 659L785 649L780 645L772 645L764 649L750 647L742 643L728 640L699 630L689 625L685 621L685 614L692 605L693 601L701 593L699 583L702 574L697 567L696 560L698 555L702 455L704 453L715 453L720 441L722 439L730 437L733 434L735 423L745 413L747 403L746 400L740 396L734 397L730 402L726 404L717 404L712 401L702 399L699 396L696 376L707 370L717 348L717 339L712 328L716 314L714 312L708 312L704 309L703 303L699 298L698 289L694 292L689 289L682 235L674 229L632 233L627 225L627 219L622 213L622 208L616 202L615 196L600 181L598 177L594 176L589 170L584 170L576 163L576 158L572 149L559 138L565 127L569 115L570 102L568 89L559 73L546 60L539 55L530 52L515 52L505 55L493 62L478 79L467 77L460 91L455 94L450 94L447 97L431 104L416 119L415 124L411 128L411 132L407 136L406 142L403 147L404 153L401 156L399 169L393 185L386 196L380 189L376 180L377 167L371 149L371 141L365 127L368 124L369 120L367 116L361 115L358 112L356 105L360 97L356 92L353 92L351 90L350 86L352 79L344 71L345 62L337 57L337 48L331 45L321 36L320 31L316 25L312 23L308 24L286 15L273 28L269 29L264 35L262 40L264 47L260 51L259 56L257 58L252 58L249 62L249 65L252 69L250 77L248 79L242 77L236 78L235 82L239 89L239 92L233 102L208 91L190 92L186 96L187 99L195 102L198 106L198 121L194 128L189 128L187 130L187 137L181 145L180 153L171 161L142 141L141 142L133 139L116 140ZM551 666L555 663L559 665L584 668L600 672L609 677L624 682L626 684L626 691L622 695L611 700L593 699L582 701L555 697L550 691ZM208 604L210 606L203 618L205 632L199 639L197 645L198 654L195 657L193 663L194 669L187 678L184 687L170 698L142 696L135 693L132 689L139 683L139 678L134 672L147 662L155 662L160 660L166 649L178 644L180 640L181 630L183 628L185 629L184 628L195 619L196 608L198 606L205 607ZM153 585L157 589L163 590L165 592L166 597L173 602L174 607L163 615L162 625L152 633L147 641L141 643L137 639L137 635L150 588ZM242 576L253 572L257 575L265 575L270 580L275 580L280 577L282 579L294 621L295 630L290 641L298 650L301 658L307 666L307 669L301 674L298 680L299 686L305 691L303 693L223 693L218 695L208 683L214 673L213 668L222 658L222 651L220 646L230 636L231 632L227 624L227 620L235 611L235 603L231 594L239 585L240 578ZM100 540L102 542L99 549L93 555L91 553L89 545L92 542ZM253 522L261 529L265 537L272 544L275 557L273 559L267 559L265 557L265 551L256 545L257 539L250 533L252 531L251 524ZM180 516L184 519L187 526L187 531L182 538L180 545L180 550L186 559L183 563L176 558L166 557L164 555L166 553L166 549L175 541L177 537L175 523ZM677 515L679 517L678 559L670 569L671 580L667 587L670 589L672 596L667 602L660 602L652 600L648 597L646 589L639 577L632 550L634 548L640 547L643 544L644 538L647 534L655 534L662 523L670 522ZM229 519L233 514L236 517L238 523L241 523L245 520L251 527L247 532L235 530L230 526L231 525ZM249 496L253 503L253 511L250 517L246 511L247 498ZM132 448L134 450L132 454L126 460L123 459L121 455L126 447ZM120 412L128 429L117 436L115 445L104 453L103 463L94 470L89 479L69 458L70 442L73 440L75 442L78 454L85 456L99 444L99 436L107 431L111 420ZM33 376L40 379L39 390L41 393L40 403L37 406L34 403L34 397L31 391L31 378ZM117 360L119 362L119 365L113 372L113 380L105 385L102 390L101 398L93 404L91 407L90 416L82 422L80 426L81 430L73 439L71 437L71 426L73 419L74 395L76 393L81 393L88 386L96 383L100 379L100 375L111 368ZM453 356L458 361L459 388L457 390L453 387L452 382L453 378L451 371L451 358ZM158 349L166 353L181 356L192 356L194 358L194 387L180 407L175 411L173 411L171 408L182 389L182 379L178 374L170 370L159 370L152 373L141 387L138 388L136 386L152 357L152 354ZM521 340L530 341L533 346L529 355L529 363L536 374L531 384L525 391L521 391L518 385L513 380L515 371L510 364L515 356L514 346ZM578 302L582 304L587 313L587 317L584 319L584 321L590 321L597 327L597 332L611 350L618 356L618 358L611 365L607 366L601 363L589 361L577 366L572 366L568 362L569 352L562 342L559 334L559 324L561 321L560 317L567 311L571 310ZM130 293L132 295L134 303L134 311L132 313L126 314L123 317L121 323L111 329L110 335L99 342L97 350L85 357L80 365L78 363L78 352L81 340L86 296L88 294ZM482 289L488 300L495 307L489 316L489 321L494 329L485 340L479 333L478 325L481 323L478 319L479 293ZM279 281L282 281L284 283L289 348L283 356L283 361L290 370L291 375L291 413L289 415L281 413L278 410L280 404L279 398L270 401L263 393L256 389L255 385L246 385L243 387L240 386L237 382L234 372L234 363L236 356L257 333L269 314L273 299L273 284ZM247 270L249 272L250 289L248 295L245 298L242 295L241 290L245 272ZM639 258L660 256L662 258L670 315L670 323L665 327L659 324L658 320L651 314L650 307L645 302L645 294L641 289L642 282L639 278L639 271L635 266L635 261ZM191 226L188 229L189 234L184 238L176 237L173 234L177 229L185 227L188 223ZM546 225L556 212L561 213L567 221L564 226L557 225L552 228ZM207 216L211 212L218 212L222 214L227 220L223 224L217 226L212 225L208 221ZM287 206L296 205L343 225L351 223L354 218L359 215L362 208L367 211L375 211L379 207L387 214L393 213L390 206L392 203L397 206L406 204L417 218L423 220L431 219L457 207L459 208L470 206L484 211L499 223L498 227L488 236L465 238L458 244L456 248L455 305L453 307L444 304L445 314L441 321L442 325L439 328L435 329L432 333L438 345L433 356L433 366L441 380L442 385L447 390L451 391L453 389L455 392L457 390L459 392L460 441L462 453L462 485L464 502L465 577L458 587L458 592L461 595L458 601L461 615L458 620L451 620L444 616L437 620L426 614L423 609L411 608L401 602L399 602L392 610L385 610L381 606L381 599L375 591L376 588L374 583L365 577L362 573L315 443L315 404L317 402L323 402L329 398L332 385L338 374L337 365L333 354L339 343L336 339L332 339L326 335L327 331L321 322L322 315L313 318L310 314L307 287L309 262L307 258L303 254L293 251L263 253L252 240L256 233L271 217ZM578 194L575 200L570 204L560 203L548 195L567 184L574 187Z"/></symbol>
     </defs>
 </svg>
 
 <!-- siluet wayang latar -->
 <div class="wy-bg" aria-hidden="true">
     <svg class="bg-gun" viewBox="0 0 200 310"><use href="#gun"/></svg>
-    <svg class="bg-pair" viewBox="0 0 280 430"><use href="#rama-shinta"/></svg>
+    <svg class="bg-pair" viewBox="0 0 820 740"><use href="#sil-rs"/></svg>
 </div>
 
 <!-- ================= Loading (hanya proses panjang) ================= -->
@@ -523,7 +464,7 @@ body{background:var(--tatah-d),var(--mist)}
 
     <div class="welcome">
         <svg class="wy-gun-w" viewBox="0 0 200 310" aria-hidden="true"><use href="#gun"/></svg>
-        <svg class="wy-welcome" viewBox="0 0 280 430" aria-hidden="true"><use href="#rama-shinta"/></svg>
+        <svg class="wy-welcome" viewBox="0 0 820 740" aria-hidden="true"><use href="#sil-rs"/></svg>
         <h1>Selamat Datang</h1>
         <p>Kelola seluruh tamu, RSVP, QR Code dan Check In melalui dashboard admin. Data diperbarui otomatis.</p>
     </div>
