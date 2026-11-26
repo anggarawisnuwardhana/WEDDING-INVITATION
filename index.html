@@ -16,23 +16,19 @@
 
 <style>
 /* =========================================================
-   TOKEN
+   TOKEN  -  Kelir Wayang (hijau lumut + coklat kulit wayang)
 ========================================================= */
 :root{
-    --night:#14261f;
-    --moss:#1f3a2e;
-    --moss-2:#2b4d3d;
-    --gold:#c9a15b;
-    --gold-soft:#e6cf9f;
-    --blush:#e8c9c1;
-    --mist:#f1f4ef;
-    --paper:#fbfcfa;
-    --ink:#22302a;
-    --muted:#667568;
-    --serif:"Cormorant Garamond",Georgia,serif;
-    --script:"Great Vibes",cursive;
-    --sans:"Jost",system-ui,sans-serif;
-    --arab:"Amiri","Traditional Arabic",serif;
+    --night:#14261f;--moss:#1f3a2e;--moss-2:#2b4d3d;
+    --leather:#5a3a22;--leather-2:#7b5030;--leather-d:#2e1c10;
+    --gold:#c9a15b;--gold-soft:#e6cf9f;--blush:#e8c9c1;
+    --parch:#efe6cf;--paper:#fbf7ec;--ink:#22302a;--muted:#6f6a52;
+    --serif:"Cormorant Garamond",Georgia,serif;--script:"Great Vibes",cursive;
+    --sans:"Jost",system-ui,sans-serif;--arab:"Amiri","Traditional Arabic",serif;
+    --bgc:var(--night);
+    /* tatahan: lubang-lubang kecil seperti kulit wayang yang dipahat */
+    --tatah:radial-gradient(circle,rgba(230,207,159,.32) 1.3px,transparent 1.8px) 0 0/16px 16px;
+    --tatah-d:radial-gradient(circle,rgba(90,58,34,.3) 1.3px,transparent 1.8px) 0 0/16px 16px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -42,52 +38,71 @@ a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
 /* =========================================================
-   REVEAL (.fade-up)
+   REVEAL (.fade-up) + varian
 ========================================================= */
-.fade-up{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease}
-.fade-up.visible{opacity:1;transform:none}
+.fade-up{opacity:0;transform:translateY(26px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1),filter 1s ease}
+.fade-up.fx-left:not(.visible){transform:translateX(-44px)}
+.fade-up.fx-right:not(.visible){transform:translateX(44px)}
+.fade-up.fx-zoom:not(.visible){transform:scale(.9)}
+.fade-up.fx-blur:not(.visible){filter:blur(8px)}
+.fade-up.visible{opacity:1;transform:none;filter:none}
 
 /* =========================================================
    ORNAMEN UMUM
 ========================================================= */
-.divider{width:140px;height:1px;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);position:relative}
-.divider::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg);outline:5px solid var(--night)}
+.divider{width:150px;height:1px;margin:26px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);position:relative}
+.divider::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg);outline:5px solid var(--bgc)}
 .inv-container{width:100%;max-width:760px;margin:0 auto;padding:0 26px;text-align:center}
-.inv-section-title{font-family:var(--script);font-size:clamp(2.4rem,8vw,3.4rem);line-height:1.2;color:var(--gold)}
-.inv-text{font-family:var(--serif);font-size:1.2rem;max-width:560px;margin:0 auto;color:inherit}
+.inv-section-title{font-family:var(--script);font-size:clamp(2.5rem,8.5vw,3.6rem);line-height:1.2;background:linear-gradient(100deg,var(--gold) 30%,#fff1cb 50%,var(--gold) 70%);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 7s linear infinite}
+@keyframes shine{to{background-position:-240% 0}}
+.inv-text{font-family:var(--serif);font-size:1.22rem;max-width:560px;margin:0 auto;color:inherit}
 .inv-title{font-family:var(--script);font-weight:400;font-size:clamp(2.8rem,10vw,4.4rem);line-height:1.25;color:var(--gold-soft)}
 .inv-and{font-family:var(--serif);font-style:italic;font-size:2rem;color:var(--gold);margin:2px 0}
-.inv-subtitle,.subtitle{font-family:var(--sans);letter-spacing:.38em;text-transform:uppercase;font-size:.78rem;color:var(--gold-soft)}
+.inv-subtitle,.subtitle{font-family:var(--sans);letter-spacing:.38em;text-transform:uppercase;font-size:.76rem;color:var(--gold-soft)}
+
+/* Latar tetap: hijau lumut + bayangan coklat di bawah */
+.background{position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(circle at 50% 0%,rgba(201,161,91,.2),transparent 50%),
+    radial-gradient(ellipse at 50% 110%,rgba(90,58,34,.55),transparent 55%),
+    linear-gradient(160deg,#10201a,#1f3a2e 60%,#14261f)}
+.overlay{position:fixed;inset:0;z-index:-1;opacity:.55;background:var(--tatah)}
+#embers{position:fixed;inset:0;z-index:50;pointer-events:none}
+
+section{position:relative}
+section[class^="inv-"]{padding:96px 0}
+/* garis emas halus di atas tiap section */
+section[class^="inv-"]::before{content:"";position:absolute;top:0;left:50%;width:min(86%,560px);height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.inv-groom::before,.inv-love::before,.inv-bride::before,.inv-event+.inv-event::before{display:none}
 
 /* =========================================================
-   BACKGROUND + COVER
+   COVER - gunungan terbelah
 ========================================================= */
-.background{position:fixed;inset:0;z-index:-2;background:
-    radial-gradient(circle at 15% 10%,rgba(201,161,91,.22),transparent 45%),
-    radial-gradient(circle at 90% 85%,rgba(232,201,193,.14),transparent 45%),
-    linear-gradient(160deg,#10201a,#1f3a2e 60%,#14261f)}
-.overlay{position:fixed;inset:0;z-index:-1;opacity:.5;background-image:
-    radial-gradient(rgba(230,207,159,.18) 1px,transparent 1px);background-size:28px 28px}
-
-.cover{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;
-    background:
-    radial-gradient(ellipse at top,rgba(201,161,91,.25),transparent 60%),
-    linear-gradient(170deg,#0e1c16,#1f3a2e 55%,#10201a);
-    transition:opacity .8s ease,transform .8s ease}
-.cover::before{content:"";position:absolute;inset:18px;border:1px solid rgba(201,161,91,.55);pointer-events:none}
-.cover::after{content:"";position:absolute;inset:26px;border:1px solid rgba(201,161,91,.2);pointer-events:none}
-.cover.hide{opacity:0;transform:scale(1.06);pointer-events:none}
-.cover-content{max-width:460px;width:100%}
-.cover .title{font-family:var(--script);font-weight:400;font-size:clamp(2.6rem,11vw,3.8rem);line-height:1.2;color:var(--gold-soft)}
+.cover{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;overflow:hidden;background:var(--night)}
+.door{position:absolute;top:0;bottom:0;width:50%;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#2b4d3d,#10201a 80%);transition:transform 1.4s cubic-bezier(.7,0,.2,1)}
+.door::before{content:"";position:absolute;inset:0;background:var(--tatah);opacity:.7;z-index:0}
+.door::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(90,58,34,.55));z-index:0}
+.door-l{left:0;border-right:2px solid var(--gold)}
+.door-r{right:0;border-left:2px solid var(--gold)}
+.door svg{position:absolute;top:0;height:100%;width:200%;z-index:1;opacity:.9}
+.door-l svg{left:0}.door-r svg{left:-100%}
+.cover::before{content:"";position:absolute;inset:16px;border:1px solid rgba(230,207,159,.6);z-index:3;pointer-events:none}
+.cover::after{content:"";position:absolute;inset:24px;border:1px solid rgba(90,58,34,.9);outline:1px solid rgba(201,161,91,.25);outline-offset:2px;z-index:3;pointer-events:none}
+.cover.hide{pointer-events:none;opacity:0;transition:opacity .6s ease 1.1s}
+.cover.hide .door-l{transform:translateX(-101%)}
+.cover.hide .door-r{transform:translateX(101%)}
+.cover.hide .cover-content{opacity:0;transform:scale(.94);transition:opacity .5s,transform .5s}
+.cover-content{position:relative;z-index:4;max-width:450px;width:100%}
+.cover-content::before{content:"";position:absolute;inset:-70px -40px;z-index:-1;background:radial-gradient(ellipse at center,rgba(10,20,15,.62),rgba(10,20,15,.34) 55%,transparent 78%)}
+.cover .title{font-family:var(--script);font-weight:400;font-size:clamp(2.7rem,11vw,3.9rem);line-height:1.2;color:var(--gold-soft);text-shadow:0 3px 16px rgba(0,0,0,.75)}
 .cover .and{font-family:var(--serif);font-style:italic;font-size:1.8rem;color:var(--gold)}
 .cover .date{font-family:var(--serif);font-size:1.35rem;letter-spacing:.08em;color:var(--paper)}
-.guest-box{margin:26px auto 22px;padding:18px 20px;border:1px solid rgba(201,161,91,.5);background:rgba(255,255,255,.05);backdrop-filter:blur(4px);border-radius:120px 120px 6px 6px}
+.guest-box{margin:26px auto 22px;padding:18px 20px;border:1px solid rgba(201,161,91,.6);background:linear-gradient(160deg,rgba(90,58,34,.7),rgba(20,38,31,.7));backdrop-filter:blur(4px);border-radius:120px 120px 6px 6px}
 .guest-box small{font-size:.8rem;letter-spacing:.12em;color:var(--gold-soft)}
 .guest-box h2{font-family:var(--serif);font-weight:600;font-size:1.7rem;color:#fff;margin-top:4px;word-break:break-word}
-.btn-open{cursor:pointer;font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:14px 34px;border-radius:50px;box-shadow:0 10px 26px rgba(0,0,0,.35);transition:transform .25s,box-shadow .25s}
-.btn-open:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(201,161,91,.4)}
+.btn-open{cursor:pointer;font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:14px 34px;border-radius:50px;box-shadow:0 10px 26px rgba(0,0,0,.45);transition:transform .25s,box-shadow .25s;animation:pulseBtn 2.8s ease-in-out infinite}
+.btn-open:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(201,161,91,.45)}
+@keyframes pulseBtn{0%,100%{box-shadow:0 10px 26px rgba(0,0,0,.45),0 0 0 0 rgba(201,161,91,.45)}50%{box-shadow:0 10px 26px rgba(0,0,0,.45),0 0 0 14px rgba(201,161,91,0)}}
 .cover .note{margin-top:22px;font-size:.78rem;color:rgba(255,255,255,.55)}
-/* animasi pembuka cover: satu rangkaian saja */
 .cover .fade-up{animation:coverIn 1s ease forwards;opacity:0}
 .cover .fade-up:nth-child(1){animation-delay:.15s}.cover .fade-up:nth-child(2){animation-delay:.35s}
 .cover .fade-up:nth-child(3){animation-delay:.5s}.cover .fade-up:nth-child(4){animation-delay:.65s}
@@ -95,17 +110,20 @@ a{color:inherit;text-decoration:none}
 .cover .fade-up:nth-child(7){animation-delay:1.1s}.cover .fade-up:nth-child(8){animation-delay:1.25s}
 @keyframes coverIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 
-#invitationContent{display:none;opacity:0;transition:opacity 1s ease}
+#invitationContent{display:none;opacity:0;transition:opacity 1.2s ease}
 #invitationContent.show{opacity:1}
 
-section{position:relative}
-section[class^="inv-"]{padding:90px 0}
-
 /* =========================================================
-   HERO
+   HERO - sinar blencong + gunungan
 ========================================================= */
-.inv-hero{min-height:100vh;display:flex;align-items:center;color:var(--paper)}
-.inv-hero .inv-title{font-size:clamp(3rem,12vw,5.2rem)}
+.inv-hero{min-height:100vh;display:flex;align-items:center;color:var(--paper);overflow:hidden}
+.inv-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(to top,rgba(90,58,34,.55),transparent);pointer-events:none}
+.rays{position:absolute;left:50%;top:46%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;background:repeating-conic-gradient(from 0deg,rgba(230,207,159,.09) 0 5deg,transparent 5deg 14deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 55%);mask-image:radial-gradient(circle,#000 0,transparent 55%);animation:spin 160s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-pair{position:absolute;left:50%;top:50%;width:min(112vw,760px);aspect-ratio:820/740;transform:translate(-50%,-50%);color:var(--gold);opacity:.17;filter:drop-shadow(0 0 16px rgba(201,161,91,.3));animation:breath 9s ease-in-out infinite;pointer-events:none}
+@keyframes breath{0%,100%{opacity:.14;transform:translate(-50%,-50%) scale(1)}50%{opacity:.22;transform:translate(-50%,-50%) scale(1.03)}}
+.inv-hero .inv-container{position:relative;z-index:1}
+.inv-hero .inv-title{font-size:clamp(3.1rem,12vw,5.3rem);background:linear-gradient(100deg,var(--gold) 30%,#fff2cf 50%,var(--gold) 70%);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 7s linear infinite}
 .inv-desc{font-family:var(--serif);font-style:italic;font-size:1.35rem;color:var(--gold-soft);margin-bottom:12px}
 .inv-scroll{margin-top:46px}
 .inv-scroll span{display:block;width:1px;height:54px;margin:0 auto 8px;background:linear-gradient(var(--gold),transparent);animation:scrollLine 2s ease-in-out infinite}
@@ -113,57 +131,55 @@ section[class^="inv-"]{padding:90px 0}
 @keyframes scrollLine{0%,100%{transform:scaleY(.4);transform-origin:top;opacity:.4}50%{transform:scaleY(1);opacity:1}}
 
 /* =========================================================
-   AYAT
+   AYAT  (kelir / kain wayang)
 ========================================================= */
-.inv-verse{background:var(--mist);color:var(--ink)}
-.inv-verse .divider::after{outline-color:var(--mist)}
+.inv-verse{--bgc:var(--parch);background:var(--tatah-d),linear-gradient(180deg,#f4ecd6,var(--parch));color:var(--ink)}
+.inv-verse .inv-section-title{background-image:linear-gradient(100deg,var(--leather-2) 30%,var(--gold) 50%,var(--leather-2) 70%);background-size:240% 100%}
 .inv-arab{font-family:var(--arab);font-weight:400;font-size:clamp(1.7rem,6vw,2.5rem);line-height:2.2;direction:rtl;color:var(--moss);margin-bottom:18px}
 .inv-latin{font-family:var(--serif);font-style:italic;color:var(--muted);margin-bottom:16px}
 .inv-translate{font-family:var(--serif);font-size:1.2rem;max-width:560px;margin:0 auto 14px}
-.inv-source{font-weight:500;letter-spacing:.18em;color:var(--gold)}
-.inv-verse .inv-section-title{color:var(--moss-2)}
+.inv-source{font-weight:500;letter-spacing:.18em;color:var(--leather-2)}
 
 /* =========================================================
    PREWEDDING HERO
 ========================================================= */
-.inv-prewed{min-height:70vh;display:flex;align-items:center;color:var(--paper);background:
-    linear-gradient(rgba(20,38,31,.55),rgba(20,38,31,.82)),
-    radial-gradient(circle at 30% 30%,#2b4d3d,#10201a)}
-.inv-prewed-overlay{position:absolute;inset:0;background:url("images/prewed-hero.jpg") center/cover no-repeat;opacity:.45}
+.inv-prewed{min-height:70vh;display:flex;align-items:center;color:var(--paper);overflow:hidden;background:linear-gradient(rgba(20,38,31,.5),rgba(46,28,16,.85)),radial-gradient(circle at 30% 30%,var(--moss-2),#10201a)}
+.inv-prewed-overlay{position:absolute;inset:0;background:url("images/prewed-hero.jpg") center/cover no-repeat;opacity:.5;animation:kenburns 24s ease-in-out infinite alternate}
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.1) translate(-1.5%,-1%)}}
 .inv-prewed .inv-container{position:relative;z-index:1}
 .inv-prewed-title{font-family:var(--serif);font-weight:600;font-style:italic;font-size:clamp(2.4rem,8vw,4rem);margin:10px 0 18px;color:#fff}
 
 /* =========================================================
-   COUPLE
+   COUPLE - foto berbentuk gunungan
 ========================================================= */
 .inv-couple{padding-bottom:30px!important;color:var(--paper)}
-.inv-groom,.inv-bride{padding:50px 0!important}
-.inv-profile{display:flex;flex-direction:column;align-items:center;gap:30px}
-.inv-photo-frame{width:min(300px,78vw);aspect-ratio:3/4;padding:10px;border:1px solid var(--gold);border-radius:150px 150px 10px 10px;position:relative;box-shadow:0 26px 50px rgba(0,0,0,.4)}
-.inv-photo-frame::before{content:"";position:absolute;inset:-14px;border:1px solid rgba(201,161,91,.3);border-radius:164px 164px 16px 16px;pointer-events:none}
-.inv-photo{width:100%;height:100%;object-fit:cover;border-radius:140px 140px 4px 4px;background:var(--moss-2)}
-.inv-profile-label{font-size:.78rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft)}
-.inv-profile-name{font-family:var(--script);font-weight:400;font-size:clamp(2.4rem,9vw,3.4rem);color:var(--gold-soft);line-height:1.3;margin-top:6px}
+.inv-groom,.inv-bride{padding:50px 0!important;color:var(--paper)}
+.inv-profile{display:flex;flex-direction:column;align-items:center;gap:34px}
+.inv-photo-frame{width:min(290px,76vw);aspect-ratio:3/4;padding:7px;position:relative;background:linear-gradient(160deg,var(--gold-soft),var(--gold) 45%,var(--leather-2));-webkit-clip-path:url(#gunClip);clip-path:url(#gunClip);animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(201,161,91,0))}50%{filter:drop-shadow(0 0 14px rgba(201,161,91,.55))}}
+.inv-photo{width:100%;height:100%;object-fit:cover;background:var(--leather);-webkit-clip-path:url(#gunClip);clip-path:url(#gunClip)}
+.inv-profile-label{font-size:.76rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-soft)}
+.inv-profile-name{font-family:var(--script);font-weight:400;font-size:clamp(2.5rem,9vw,3.5rem);color:var(--gold-soft);line-height:1.3;margin-top:6px}
 .inv-profile-desc{font-family:var(--serif);font-style:italic;font-size:1.15rem;color:var(--paper);opacity:.85}
 .inv-parent{font-family:var(--serif);font-weight:600;font-size:1.3rem;color:#fff}
 @media(min-width:768px){
-    .inv-profile{flex-direction:row;text-align:left;gap:60px;justify-content:center}
+    .inv-profile{flex-direction:row;text-align:left;gap:64px;justify-content:center}
     .inv-profile-reverse{flex-direction:row-reverse}
     .inv-profile-content .divider{margin-left:0}
     .inv-container:has(.inv-profile){max-width:900px}
 }
-.inv-love{padding:40px 0!important;color:var(--paper)}
+.inv-love{padding:46px 0!important;color:var(--paper)}
 .inv-love-icon{font-size:2.2rem;color:var(--blush);animation:beat 1.8s ease-in-out infinite}
 .inv-love-text{font-family:var(--serif);font-style:italic;font-size:1.3rem;color:var(--gold-soft);margin-top:10px}
 @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 
 /* =========================================================
-   GALERI
+   GALERI (kulit coklat)
 ========================================================= */
-.inv-gallery-preview{color:var(--paper)}
-.inv-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
-.inv-gallery-item{overflow:hidden;border:1px solid rgba(201,161,91,.5);padding:6px;background:rgba(255,255,255,.04)}
-.inv-gallery-item img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/4;transition:transform .8s ease;background:var(--moss-2)}
+.inv-gallery-preview{--bgc:var(--leather-d);color:var(--paper);background:var(--tatah),linear-gradient(180deg,var(--leather-d),#3b2414 50%,var(--leather-d))}
+.inv-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
+.inv-gallery-item{overflow:hidden;border:1px solid var(--gold);padding:7px;background:rgba(20,38,31,.45)}
+.inv-gallery-item img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/4;transition:transform .9s ease;background:var(--moss-2)}
 .inv-gallery-item:hover img{transform:scale(1.06)}
 .inv-gallery-item:first-child{grid-column:1/-1}
 .inv-gallery-item:first-child img{aspect-ratio:16/10}
@@ -171,53 +187,57 @@ section[class^="inv-"]{padding:90px 0}
 /* =========================================================
    COUNTDOWN + CALENDAR
 ========================================================= */
-.inv-countdown{background:var(--mist);color:var(--ink)}
-.inv-countdown .inv-section-title{color:var(--moss-2)}
-.inv-countdown .divider::after{outline-color:var(--mist)}
+.inv-countdown{--bgc:var(--parch);background:var(--tatah-d),linear-gradient(180deg,var(--parch),#f4ecd6);color:var(--ink)}
+.inv-countdown .inv-section-title{background-image:linear-gradient(100deg,var(--leather-2) 30%,var(--gold) 50%,var(--leather-2) 70%);background-size:240% 100%}
 .inv-countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:38px auto 0;max-width:520px}
-.inv-count-item{background:var(--moss);color:var(--gold-soft);padding:20px 4px;border-radius:70px 70px 8px 8px;box-shadow:0 14px 28px rgba(20,38,31,.25)}
+.inv-count-item{background:linear-gradient(170deg,var(--moss-2),var(--moss));color:var(--gold-soft);padding:20px 4px;border-radius:70px 70px 8px 8px;border:1px solid var(--gold);box-shadow:inset 0 0 0 4px var(--moss),inset 0 0 0 5px rgba(201,161,91,.45),0 14px 28px rgba(46,28,16,.3)}
 .inv-count-item h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.1}
-.inv-count-item span{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);opacity:.8}
+.inv-count-item span{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);opacity:.85}
 .calendar-box{text-align:center;margin-top:44px;padding:0 24px}
-.calendar-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:16px;color:var(--muted)}
-.calendar-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border-radius:50px;background:var(--moss);color:var(--gold-soft);font-weight:400;transition:transform .25s,background .25s}
+.calendar-title{font-family:var(--serif);font-size:1.15rem;margin-bottom:16px;color:var(--muted)}
+.calendar-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border-radius:50px;background:var(--moss);color:var(--gold-soft);font-weight:400;border:1px solid var(--gold);transition:transform .25s,background .25s}
 .calendar-btn:hover{background:var(--moss-2);transform:translateY(-2px)}
 
 /* =========================================================
-   ACARA
+   ACARA (kartu kulit wayang bertatahan)
 ========================================================= */
 .inv-event{padding:40px 0!important}
+.inv-event:first-of-type{padding-top:96px!important}
 .inv-event+.inv-event{padding-top:0!important}
-.inv-event-card{position:relative;max-width:480px;margin:0 auto;padding:46px 30px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(201,161,91,.55);color:var(--paper);border-radius:200px 200px 12px 12px;backdrop-filter:blur(4px)}
-.inv-event-card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(201,161,91,.2);border-radius:194px 194px 8px 8px;pointer-events:none}
-.inv-event-title{font-family:var(--script);font-weight:400;font-size:2.8rem;color:var(--gold-soft);margin-top:10px}
-.inv-event-card p{font-family:var(--serif);font-size:1.15rem;margin-bottom:12px}
+.inv-event-card{position:relative;max-width:480px;margin:0 auto;padding:50px 30px;color:var(--paper);border-radius:200px 200px 12px 12px;border:1px solid var(--gold);background:var(--tatah),linear-gradient(170deg,var(--leather-2),var(--leather) 45%,var(--leather-d));box-shadow:0 28px 54px rgba(0,0,0,.5),inset 0 0 40px rgba(0,0,0,.3)}
+.inv-event-card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(230,207,159,.45);border-radius:194px 194px 8px 8px;pointer-events:none}
+.inv-event-card .divider{--bgc:var(--leather)}
+.inv-event-title{font-family:var(--script);font-weight:400;font-size:3rem;color:var(--gold-soft);margin-top:10px;line-height:1.3}
+.inv-event-card p{font-family:var(--serif);font-size:1.18rem;margin-bottom:12px}
 .inv-event-card strong{font-family:var(--sans);font-weight:500;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
 
 /* =========================================================
    MAPS
 ========================================================= */
 .inv-map{color:var(--paper)}
-.inv-map-box{margin-top:30px;padding:8px;border:1px solid rgba(201,161,91,.6);border-radius:14px;background:rgba(255,255,255,.05);box-shadow:0 24px 44px rgba(0,0,0,.35)}
-.inv-map-box iframe{display:block;width:100%;height:360px;border:0;border-radius:8px;filter:saturate(.85)}
+.inv-map-box{margin-top:30px;padding:9px;border:1px solid var(--gold);border-radius:14px;background:linear-gradient(160deg,var(--leather),var(--leather-d));box-shadow:0 24px 44px rgba(0,0,0,.45)}
+.inv-map-box iframe{display:block;width:100%;height:360px;border:0;border-radius:8px;filter:sepia(.2) saturate(.9)}
 
 /* =========================================================
    E-TICKET
 ========================================================= */
-.inv-ticket{background:var(--mist);color:var(--ink)}
-.inv-ticket .inv-section-title{color:var(--moss-2)}
-.inv-ticket .divider::after{outline-color:var(--mist)}
-.eticket-card{display:none;max-width:480px;margin:36px auto 0;background:#fff;border-radius:18px;overflow:hidden;text-align:left;box-shadow:0 24px 48px rgba(20,38,31,.22);position:relative}
+.inv-ticket{--bgc:var(--parch);background:var(--tatah-d),linear-gradient(180deg,#f4ecd6,var(--parch));color:var(--ink)}
+.inv-ticket .inv-section-title{background-image:linear-gradient(100deg,var(--leather-2) 30%,var(--gold) 50%,var(--leather-2) 70%);background-size:240% 100%}
+.eticket-card{display:none;max-width:480px;margin:36px auto 0;background:#fff;border-radius:18px;overflow:hidden;text-align:left;box-shadow:0 24px 48px rgba(46,28,16,.28);position:relative;border:1px solid var(--gold)}
 .eticket-card.visible,.eticket-card[style*="block"]{opacity:1;transform:none}
 .ticket-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:linear-gradient(135deg,var(--moss),var(--moss-2));color:var(--gold-soft);font-family:var(--serif);font-size:1.25rem;font-weight:600;letter-spacing:.06em}
-.ticket-body{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:26px 24px;border-top:2px dashed var(--gold-soft);position:relative}
-.ticket-body::before,.ticket-body::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--mist)}
+.ticket-body{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:26px 24px;border-top:2px dashed var(--gold);position:relative}
+.ticket-body::before,.ticket-body::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--parch)}
 .ticket-body::before{left:-10px}.ticket-body::after{right:-10px}
 .ticket-left{flex:1;min-width:0}
 .ticket-name{font-family:var(--serif);font-weight:700;font-size:1.55rem;line-height:1.25;color:var(--moss);margin-bottom:14px;word-break:break-word}
 .ticket-status,.ticket-time{display:flex;align-items:center;gap:8px;font-size:.92rem;color:var(--muted);margin-bottom:6px}
 .ticket-status i{color:var(--gold)}
 .ticket-right img{width:130px;height:130px;object-fit:contain;padding:6px;border:1px solid var(--gold-soft);border-radius:8px;background:#fff}
+.ticket-actions{padding:0 24px 24px}
+.dl-btn{width:100%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:13px 20px;border-radius:50px;box-shadow:0 10px 22px rgba(201,161,91,.4);transition:transform .2s}
+.dl-btn:hover{transform:translateY(-2px)}
+.dl-btn:disabled{opacity:.6;cursor:wait}
 
 .floating-ticket{position:fixed;right:16px;bottom:18px;z-index:900;display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:50px;background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:var(--night);font-size:.9rem;font-weight:500;box-shadow:0 10px 24px rgba(0,0,0,.4);transition:transform .25s}
 .floating-ticket:hover{transform:translateY(-3px)}
@@ -226,7 +246,8 @@ section[class^="inv-"]{padding:90px 0}
    WEDDING GIFT
 ========================================================= */
 .inv-gift{color:var(--paper)}
-.gift-card{max-width:440px;margin:28px auto 0;padding:28px 24px;border:1px solid rgba(201,161,91,.55);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.02));text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.28)}
+.gift-card{max-width:440px;margin:28px auto 0;padding:28px 24px;border:1px solid var(--gold);border-radius:16px;background:var(--tatah),linear-gradient(160deg,rgba(123,80,48,.55),rgba(46,28,16,.7));text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.35);position:relative}
+.gift-card::before{content:"";position:absolute;inset:5px;border:1px solid rgba(230,207,159,.3);border-radius:12px;pointer-events:none}
 .gift-card:first-of-type{margin-top:40px}
 .gift-bank{display:flex;align-items:center;justify-content:center;gap:12px;font-size:.82rem;letter-spacing:.14em;color:var(--gold-soft)}
 .gift-logo{height:26px;width:auto;background:#fff;padding:3px 8px;border-radius:5px}
@@ -234,26 +255,25 @@ section[class^="inv-"]{padding:90px 0}
 .gift-owner{font-family:var(--serif);font-style:italic;font-size:1.1rem;opacity:.85;margin-bottom:18px}
 .copy-btn{cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:.92rem;color:var(--night);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border:none;padding:11px 24px;border-radius:50px;transition:transform .2s}
 .copy-btn:hover{transform:translateY(-2px)}
-#toast,#rsvpToast{position:fixed;left:50%;bottom:30px;z-index:2000;transform:translate(-50%,30px);opacity:0;pointer-events:none;padding:13px 24px;border-radius:50px;background:var(--paper);color:var(--moss);font-weight:500;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,.4);transition:opacity .35s,transform .35s;white-space:nowrap}
+#toast,#rsvpToast{position:fixed;left:50%;bottom:30px;z-index:2000;transform:translate(-50%,30px);opacity:0;pointer-events:none;padding:13px 24px;border-radius:50px;background:var(--paper);color:var(--moss);border:1px solid var(--gold);font-weight:500;font-size:.92rem;box-shadow:0 12px 30px rgba(0,0,0,.4);transition:opacity .35s,transform .35s;white-space:nowrap}
 #toast.show,#rsvpToast.show{opacity:1;transform:translate(-50%,0)}
 
 /* =========================================================
    RSVP & KOMENTAR
 ========================================================= */
-.inv-rsvp{background:var(--mist);color:var(--ink)}
-.inv-rsvp .inv-section-title{color:var(--moss-2)}
-.inv-rsvp .divider::after{outline-color:var(--mist)}
+.inv-rsvp{--bgc:var(--parch);background:var(--tatah-d),linear-gradient(180deg,var(--parch),#f4ecd6);color:var(--ink)}
+.inv-rsvp .inv-section-title{background-image:linear-gradient(100deg,var(--leather-2) 30%,var(--gold) 50%,var(--leather-2) 70%);background-size:240% 100%}
 .rsvp-form{max-width:520px;margin:34px auto 0;display:flex;flex-direction:column;gap:14px;text-align:left}
-.rsvp-form input,.rsvp-form textarea{width:100%;font-family:var(--sans);font-size:1rem;font-weight:300;color:var(--ink);background:#fff;border:1px solid #d6ddd5;border-radius:12px;padding:14px 18px;resize:vertical;transition:border-color .25s,box-shadow .25s}
+.rsvp-form input,.rsvp-form textarea{width:100%;font-family:var(--sans);font-size:1rem;font-weight:300;color:var(--ink);background:#fff;border:1px solid #d9ccaa;border-radius:12px;padding:14px 18px;resize:vertical;transition:border-color .25s,box-shadow .25s}
 .rsvp-form input:focus,.rsvp-form textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,161,91,.2)}
-#sendRSVP{cursor:pointer;font-family:var(--sans);font-size:1rem;color:var(--gold-soft);background:var(--moss);border:none;border-radius:50px;padding:14px;transition:background .25s,transform .25s}
+#sendRSVP{cursor:pointer;font-family:var(--sans);font-size:1rem;color:var(--gold-soft);background:var(--moss);border:1px solid var(--gold);border-radius:50px;padding:14px;transition:background .25s,transform .25s}
 #sendRSVP:hover{background:var(--moss-2);transform:translateY(-2px)}
 #sendRSVP:disabled{opacity:.6;cursor:wait}
 .comments-header{margin:46px 0 18px}
-.comment-counter{display:inline-block;font-family:var(--serif);font-weight:600;font-size:1.2rem;padding:8px 22px;border-radius:50px;background:var(--moss);color:var(--gold-soft)}
+.comment-counter{display:inline-block;font-family:var(--serif);font-weight:600;font-size:1.2rem;padding:8px 22px;border-radius:50px;background:var(--moss);color:var(--gold-soft);border:1px solid var(--gold)}
 .comments-loading{font-family:var(--serif);font-style:italic;color:var(--muted)}
 #comments{max-width:560px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:14px}
-#comments>div,#comments .comment,#comments .comment-item,#comments .comment-card{background:#fff;border-left:3px solid var(--gold);border-radius:10px;padding:16px 20px;box-shadow:0 8px 20px rgba(20,38,31,.08)}
+#comments>div,#comments .comment,#comments .comment-item,#comments .comment-card{background:#fff;border-left:3px solid var(--gold);border-radius:10px;padding:16px 20px;box-shadow:0 8px 20px rgba(46,28,16,.1)}
 #comments b,#comments strong,#comments .comment-name{display:block;font-family:var(--serif);font-weight:700;font-size:1.15rem;color:var(--moss)}
 #comments small,#comments .comment-time{font-size:.75rem;color:var(--muted)}
 #comments p{margin-top:4px;word-break:break-word}
@@ -264,7 +284,9 @@ section[class^="inv-"]{padding:90px 0}
 /* =========================================================
    PENUTUP
 ========================================================= */
-.inv-footer{color:var(--paper);padding-bottom:130px!important}
+.inv-footer{color:var(--paper);padding-bottom:130px!important;overflow:hidden;background:linear-gradient(to top,rgba(46,28,16,.7),transparent 70%)}
+.foot-gun{position:absolute;left:50%;bottom:-4%;height:70%;aspect-ratio:200/310;transform:translateX(-50%);color:var(--gold);opacity:.1;pointer-events:none}
+.inv-footer .inv-container{position:relative;z-index:1}
 .inv-footer-title{font-family:var(--script);font-weight:400;font-size:clamp(2.8rem,10vw,4rem);color:var(--gold)}
 .inv-footer .inv-text{margin-bottom:34px}
 
@@ -272,7 +294,7 @@ section[class^="inv-"]{padding:90px 0}
    RESPONSIVE + MOTION
 ========================================================= */
 @media(max-width:480px){
-    section[class^="inv-"]{padding:70px 0}
+    section[class^="inv-"]{padding:76px 0}
     .inv-map-box iframe{height:280px}
     .ticket-body{flex-direction:column-reverse;text-align:center}
     .ticket-status,.ticket-time{justify-content:center}
@@ -282,19 +304,89 @@ section[class^="inv-"]{padding:90px 0}
 }
 @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
-    .fade-up{opacity:1!important;transform:none!important}
+    .fade-up{opacity:1!important;transform:none!important;filter:none!important}
+    #embers{display:none}
 }
 </style>
 </head>
 
 <body>
 
+    <!-- Simbol & bentuk SVG -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <clipPath id="gunClip" clipPathUnits="objectBoundingBox">
+                <path d="M0.5 0C0.58 0.17 1 0.27 1 0.58C1 0.83 0.78 0.96 0.5 1C0.22 0.96 0 0.83 0 0.58C0 0.27 0.42 0.17 0.5 0Z"/>
+            </clipPath>
+            <linearGradient id="gGun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dc95"/><stop offset=".55" stop-color="#d4a94f"/><stop offset="1" stop-color="#a97a34"/></linearGradient>
+            <pattern id="pdg" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r=".9" fill="#8c2b25" fill-opacity=".4"/></pattern>
+
+            <!-- ========== GUNUNGAN (kayon) mengikuti bentuk wayang asli ========== -->
+            <symbol id="gun" viewBox="0 0 200 310">
+                <path id="gunO" d="M100 2L7 176Q3 186 10 196Q16 212 20 224Q22 236 24 248L36 290Q40 304 52 306H148Q160 304 164 290L176 248Q178 236 180 224Q184 212 190 196Q197 186 193 176Z"/>
+                <use href="#gunO" fill="url(#gGun)" stroke="#8c2b25" stroke-width="3"/>
+                <use href="#gunO" fill="url(#pdg)"/>
+                <use href="#gunO" transform="translate(100 156) scale(.93) translate(-100 -156)" fill="none" stroke="#c0463a" stroke-width="1.4"/>
+                <!-- pohon kehidupan -->
+                <g fill="none" stroke="#6b3a1a" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M100 126V34M100 102Q78 100 66 78M100 102Q122 100 134 78M100 80Q84 76 76 58M100 80Q116 76 124 58M100 58Q90 54 86 40M100 58Q110 54 114 40M100 34V14"/>
+                    <path d="M66 78Q56 70 58 60M134 78Q144 70 142 60M76 58Q68 52 70 44M124 58Q132 52 130 44"/>
+                </g>
+                <g fill="#c0463a"><circle cx="58" cy="60" r="2.4"/><circle cx="142" cy="60" r="2.4"/><circle cx="70" cy="44" r="2.2"/><circle cx="130" cy="44" r="2.2"/><circle cx="86" cy="40" r="2"/><circle cx="114" cy="40" r="2"/><circle cx="100" cy="12" r="2.6"/></g>
+                <!-- merak -->
+                <g fill="#2d6a6a" stroke="#6b3a1a" stroke-width=".8"><path d="M56 124Q58 98 80 102Q90 114 84 126Z"/><path d="M144 124Q142 98 120 102Q110 114 116 126Z"/></g>
+                <g fill="#f3dc95"><circle cx="70" cy="110" r="2"/><circle cx="78" cy="106" r="1.8"/><circle cx="130" cy="110" r="2"/><circle cx="122" cy="106" r="1.8"/></g>
+                <!-- kala / wajah -->
+                <path d="M83 136Q84 114 100 110Q116 114 117 136Q108 126 100 129Q92 126 83 136Z" fill="#c0463a" stroke="#6b3a1a" stroke-width=".8"/>
+                <circle cx="100" cy="138" r="11" fill="#e89a8c" stroke="#6b3a1a" stroke-width=".9"/>
+                <circle cx="96" cy="135" r="1.9" fill="#fff"/><circle cx="104" cy="135" r="1.9" fill="#fff"/>
+                <path d="M93 143Q100 150 107 143Q100 146 93 143Z" fill="#c0463a" stroke="#8c2b25" stroke-width=".8"/>
+                <path d="M96 149V166H104V149Z" fill="#d4a94f" stroke="#6b3a1a" stroke-width=".9"/>
+                <!-- harimau & banteng -->
+                <g stroke="#6b3a1a" stroke-width=".9"><ellipse cx="50" cy="162" rx="17" ry="6.5" fill="#e8924a"/><circle cx="67" cy="157" r="5" fill="#e8924a"/><ellipse cx="150" cy="162" rx="17" ry="6.5" fill="#2f3b4a"/><circle cx="133" cy="157" r="5.5" fill="#2f3b4a"/></g>
+                <path d="M42 157v10M48 156v11M54 156v11M40 168v7M60 168v7M133 150l-4-5M137 150l4-5" stroke="#3a2415" stroke-width="1.2" fill="none"/>
+                <path d="M146 168v7M158 168v7" stroke="#f4ecd2" stroke-width="1.6"/>
+                <!-- sayap & kepala garuda -->
+                <g fill="#7db26a" stroke="#6b3a1a" stroke-width=".8"><path d="M9 186Q26 172 50 186L44 212Q24 214 13 198Z"/><path d="M191 186Q174 172 150 186L156 212Q176 214 187 198Z"/></g>
+                <g fill="none" stroke="#c0463a" stroke-width="1"><path d="M13 190Q28 182 46 192M14 198Q30 190 44 200M17 206Q30 200 42 208"/><path d="M187 190Q172 182 154 192M186 198Q170 190 156 200M183 206Q170 200 158 208"/></g>
+                <g fill="#d4a94f" stroke="#6b3a1a" stroke-width=".9"><circle cx="58" cy="206" r="9"/><circle cx="142" cy="206" r="9"/></g>
+                <g fill="#fff"><circle cx="56" cy="204" r="2"/><circle cx="144" cy="204" r="2"/></g>
+                <path d="M64 210L76 216L66 218M136 210L124 216L134 218" fill="#c0463a" stroke="#6b3a1a" stroke-width=".7"/>
+                <!-- atap rumah -->
+                <path d="M100 176L68 226H132Z" fill="#a14034" stroke="#e6cf9f" stroke-width="1.2"/>
+                <path d="M100 176L84 226M100 176L116 226M88 202H112M80 214H120" stroke="#e6cf9f" stroke-width=".8" fill="none"/>
+                <!-- gerbang -->
+                <g fill="#f4ecd2" stroke="#6b3a1a" stroke-width=".8"><rect x="75" y="228" width="5" height="58"/><rect x="83" y="228" width="4" height="58"/><rect x="120" y="228" width="5" height="58"/><rect x="113" y="228" width="4" height="58"/></g>
+                <rect x="90" y="232" width="20" height="54" fill="#e8a24a" stroke="#6b3a1a"/>
+                <rect x="93" y="236" width="14" height="48" fill="#cfe3ea" stroke="#3a7ca5" stroke-width=".8"/>
+                <path d="M97 243h2v14h-2zM101 243h2v14h-2z" fill="#3a2415"/>
+                <path d="M86 286H114L126 306H74Z" fill="#c0463a" stroke="#6b3a1a" stroke-width=".8"/>
+                <path d="M80 296H120M92 286L88 306M100 286V306M108 286L112 306" stroke="#e6cf9f" stroke-width=".6" fill="none"/>
+                <!-- raksasa penjaga bergada & perisai -->
+                <g stroke="#6b3a1a" stroke-width=".8">
+                    <path d="M31 302L48 250" stroke="#3a4a46" stroke-width="5" stroke-linecap="round"/><path d="M169 302L152 250" stroke="#3a4a46" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="48" cy="266" r="6.5" fill="#e89a8c"/><circle cx="152" cy="266" r="6.5" fill="#e89a8c"/>
+                    <circle cx="52" cy="286" r="11" fill="#f3dc95"/><circle cx="148" cy="286" r="11" fill="#f3dc95"/>
+                </g>
+                <g fill="none" stroke="#2a1a10" stroke-width="2.6" stroke-linecap="round"><path d="M40 262Q44 252 56 258"/><path d="M160 262Q156 252 144 258"/></g>
+                <path d="M52 278L54 284L60 284L55 288L57 294L52 290L47 294L49 288L44 284L50 284ZM148 278L150 284L156 284L151 288L153 294L148 290L143 294L145 288L140 284L146 284Z" fill="#c0463a"/>
+                <g fill="none" stroke="#4a7a3a" stroke-width="1.3" stroke-linecap="round"><path d="M16 298Q28 292 38 298"/><path d="M184 298Q172 292 162 298"/></g>
+            </symbol>
+
+            <!-- ========== RAMA & SHINTA ========== -->
+        </defs>
+    </svg>
+
     <!-- Background -->
     <div class="background"></div>
     <div class="overlay"></div>
+    <canvas id="embers" aria-hidden="true"></canvas>
 
     <!-- Cover -->
     <section class="cover">
+
+        <div class="door door-l"><svg viewBox="0 0 200 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><use href="#gun"/></svg></div>
+        <div class="door door-r"><svg viewBox="0 0 200 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><use href="#gun"/></svg></div>
 
         <div class="cover-content">
 
@@ -331,21 +423,25 @@ section[class^="inv-"]{padding:90px 0}
 
         <!-- ================= HERO ================= -->
         <section class="inv-hero">
+            <div class="rays" aria-hidden="true"></div>
+            <!-- siluet samar Rama & Shinta (di-trace dari foto wayang referensi) -->
+            <svg class="hero-pair" viewBox="0 0 820 740" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M109 145L109 154L117 154L121 156L128 165L127 168L134 218L131 221L121 223L117 228L117 231L129 238L131 260L128 263L79 265L76 267L68 268L64 274L58 329L54 331L45 328L45 333L47 335L40 344L40 348L38 350L28 351L26 357L32 364L32 367L26 378L26 389L31 399L33 408L39 414L38 415L40 413L46 415L43 408L46 383L48 381L52 385L52 399L43 468L81 505L72 513L70 517L70 526L73 531L60 539L57 545L57 557L67 570L60 576L56 583L56 591L59 599L52 608L52 615L55 621L49 628L49 636L52 641L49 650L49 657L53 663L52 675L54 680L59 683L67 677L65 663L72 654L70 641L79 630L77 621L85 610L85 602L83 596L91 588L93 590L93 593L89 598L89 606L92 613L86 621L88 636L82 642L82 650L85 657L80 662L80 672L84 678L80 682L80 691L86 696L84 706L88 712L110 712L127 717L146 719L158 725L177 725L216 721L304 722L323 716L345 718L355 715L368 719L377 718L381 713L383 704L380 693L374 688L357 689L350 692L343 690L338 685L342 676L340 670L337 667L331 665L327 660L331 649L329 641L333 632L323 618L308 545L308 529L303 517L313 506L317 511L330 547L347 588L345 599L351 606L351 613L354 618L371 626L377 631L379 636L387 636L406 630L417 623L431 625L433 627L424 633L422 637L423 640L419 644L419 648L414 653L414 658L418 657L436 644L450 645L458 641L474 639L476 637L476 632L482 623L483 617L491 607L491 603L488 598L491 586L485 578L483 569L485 565L485 524L483 520L485 513L485 483L483 481L485 475L485 450L481 357L486 350L488 352L488 366L498 378L496 385L497 390L507 398L512 406L507 415L508 419L511 423L522 424L526 427L521 443L518 469L508 480L508 484L511 491L521 493L524 498L520 510L521 583L519 641L521 648L527 656L528 661L527 687L522 692L512 696L489 696L485 706L487 715L494 720L506 717L511 717L518 720L537 718L560 725L591 728L615 718L626 719L640 714L653 716L663 715L667 711L666 705L651 689L653 686L662 685L680 688L704 688L724 684L752 682L767 677L782 665L785 659L785 649L780 645L772 645L764 649L750 647L742 643L728 640L699 630L689 625L685 621L685 614L692 605L693 601L701 593L699 583L702 574L697 567L696 560L698 555L702 455L704 453L715 453L720 441L722 439L730 437L733 434L735 423L745 413L747 403L746 400L740 396L734 397L730 402L726 404L717 404L712 401L702 399L699 396L696 376L707 370L717 348L717 339L712 328L716 314L714 312L708 312L704 309L703 303L699 298L698 289L694 292L689 289L682 235L674 229L632 233L627 225L627 219L622 213L622 208L616 202L615 196L600 181L598 177L594 176L589 170L584 170L576 163L576 158L572 149L559 138L565 127L569 115L570 102L568 89L559 73L546 60L539 55L530 52L515 52L505 55L493 62L478 79L467 77L460 91L455 94L450 94L447 97L431 104L416 119L415 124L411 128L411 132L407 136L406 142L403 147L404 153L401 156L399 169L393 185L386 196L380 189L376 180L377 167L371 149L371 141L365 127L368 124L369 120L367 116L361 115L358 112L356 105L360 97L356 92L353 92L351 90L350 86L352 79L344 71L345 62L337 57L337 48L331 45L321 36L320 31L316 25L312 23L308 24L286 15L273 28L269 29L264 35L262 40L264 47L260 51L259 56L257 58L252 58L249 62L249 65L252 69L250 77L248 79L242 77L236 78L235 82L239 89L239 92L233 102L208 91L190 92L186 96L187 99L195 102L198 106L198 121L194 128L189 128L187 130L187 137L181 145L180 153L171 161L142 141L141 142L133 139L116 140ZM551 666L555 663L559 665L584 668L600 672L609 677L624 682L626 684L626 691L622 695L611 700L593 699L582 701L555 697L550 691ZM208 604L210 606L203 618L205 632L199 639L197 645L198 654L195 657L193 663L194 669L187 678L184 687L170 698L142 696L135 693L132 689L139 683L139 678L134 672L147 662L155 662L160 660L166 649L178 644L180 640L181 630L183 628L185 629L184 628L195 619L196 608L198 606L205 607ZM153 585L157 589L163 590L165 592L166 597L173 602L174 607L163 615L162 625L152 633L147 641L141 643L137 639L137 635L150 588ZM242 576L253 572L257 575L265 575L270 580L275 580L280 577L282 579L294 621L295 630L290 641L298 650L301 658L307 666L307 669L301 674L298 680L299 686L305 691L303 693L223 693L218 695L208 683L214 673L213 668L222 658L222 651L220 646L230 636L231 632L227 624L227 620L235 611L235 603L231 594L239 585L240 578ZM100 540L102 542L99 549L93 555L91 553L89 545L92 542ZM253 522L261 529L265 537L272 544L275 557L273 559L267 559L265 557L265 551L256 545L257 539L250 533L252 531L251 524ZM180 516L184 519L187 526L187 531L182 538L180 545L180 550L186 559L183 563L176 558L166 557L164 555L166 553L166 549L175 541L177 537L175 523ZM677 515L679 517L678 559L670 569L671 580L667 587L670 589L672 596L667 602L660 602L652 600L648 597L646 589L639 577L632 550L634 548L640 547L643 544L644 538L647 534L655 534L662 523L670 522ZM229 519L233 514L236 517L238 523L241 523L245 520L251 527L247 532L235 530L230 526L231 525ZM249 496L253 503L253 511L250 517L246 511L247 498ZM132 448L134 450L132 454L126 460L123 459L121 455L126 447ZM120 412L128 429L117 436L115 445L104 453L103 463L94 470L89 479L69 458L70 442L73 440L75 442L78 454L85 456L99 444L99 436L107 431L111 420ZM33 376L40 379L39 390L41 393L40 403L37 406L34 403L34 397L31 391L31 378ZM117 360L119 362L119 365L113 372L113 380L105 385L102 390L101 398L93 404L91 407L90 416L82 422L80 426L81 430L73 439L71 437L71 426L73 419L74 395L76 393L81 393L88 386L96 383L100 379L100 375L111 368ZM453 356L458 361L459 388L457 390L453 387L452 382L453 378L451 371L451 358ZM158 349L166 353L181 356L192 356L194 358L194 387L180 407L175 411L173 411L171 408L182 389L182 379L178 374L170 370L159 370L152 373L141 387L138 388L136 386L152 357L152 354ZM521 340L530 341L533 346L529 355L529 363L536 374L531 384L525 391L521 391L518 385L513 380L515 371L510 364L515 356L514 346ZM578 302L582 304L587 313L587 317L584 319L584 321L590 321L597 327L597 332L611 350L618 356L618 358L611 365L607 366L601 363L589 361L577 366L572 366L568 362L569 352L562 342L559 334L559 324L561 321L560 317L567 311L571 310ZM130 293L132 295L134 303L134 311L132 313L126 314L123 317L121 323L111 329L110 335L99 342L97 350L85 357L80 365L78 363L78 352L81 340L86 296L88 294ZM482 289L488 300L495 307L489 316L489 321L494 329L485 340L479 333L478 325L481 323L478 319L479 293ZM279 281L282 281L284 283L289 348L283 356L283 361L290 370L291 375L291 413L289 415L281 413L278 410L280 404L279 398L270 401L263 393L256 389L255 385L246 385L243 387L240 386L237 382L234 372L234 363L236 356L257 333L269 314L273 299L273 284ZM247 270L249 272L250 289L248 295L245 298L242 295L241 290L245 272ZM639 258L660 256L662 258L670 315L670 323L665 327L659 324L658 320L651 314L650 307L645 302L645 294L641 289L642 282L639 278L639 271L635 266L635 261ZM191 226L188 229L189 234L184 238L176 237L173 234L177 229L185 227L188 223ZM546 225L556 212L561 213L567 221L564 226L557 225L552 228ZM207 216L211 212L218 212L222 214L227 220L223 224L217 226L212 225L208 221ZM287 206L296 205L343 225L351 223L354 218L359 215L362 208L367 211L375 211L379 207L387 214L393 213L390 206L392 203L397 206L406 204L417 218L423 220L431 219L457 207L459 208L470 206L484 211L499 223L498 227L488 236L465 238L458 244L456 248L455 305L453 307L444 304L445 314L441 321L442 325L439 328L435 329L432 333L438 345L433 356L433 366L441 380L442 385L447 390L451 391L453 389L455 392L457 390L459 392L460 441L462 453L462 485L464 502L465 577L458 587L458 592L461 595L458 601L461 615L458 620L451 620L444 616L437 620L426 614L423 609L411 608L401 602L399 602L392 610L385 610L381 606L381 599L375 591L376 588L374 583L365 577L362 573L315 443L315 404L317 402L323 402L329 398L332 385L338 374L337 365L333 354L339 343L336 339L332 339L326 335L327 331L321 322L322 315L313 318L310 314L307 287L309 262L307 258L303 254L293 251L263 253L252 240L256 233L271 217ZM578 194L575 200L570 204L560 203L548 195L567 184L574 187Z"/></svg>
             <div class="inv-container">
 
-                <p class="inv-subtitle fade-up">Wedding Invitation</p>
 
-                <h1 class="inv-title fade-up">Rey Mboyong, S.H</h1>
+                <p class="inv-subtitle fade-up fx-blur">Wedding Invitation</p>
 
-                <div class="inv-and fade-up">&</div>
+                <h1 class="inv-title fade-up fx-left">Rey Mboyong, S.H</h1>
 
-                <h1 class="inv-title fade-up">Dinda Hai, S.Gz</h1>
+                <div class="inv-and fade-up fx-zoom">&</div>
+
+                <h1 class="inv-title fade-up fx-right">Dinda Hai, S.Gz</h1>
 
                 <div class="divider fade-up"></div>
 
-                <p class="inv-desc fade-up">Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
+                <p class="inv-desc fade-up fx-blur">Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
 
-                <p class="inv-text fade-up">
+                <p class="inv-text fade-up fx-blur">
                     Dengan memohon rahmat dan ridho Allah SWT,
                     kami bermaksud menyelenggarakan acara
                     pernikahan putra-putri kami dan dengan penuh
@@ -369,7 +465,7 @@ section[class^="inv-"]{padding:90px 0}
 
                 <div class="divider fade-up"></div>
 
-                <h2 class="inv-arab fade-up">
+                <h2 class="inv-arab fade-up fx-blur">
                     وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ
                     مِنْ أَنْفُسِكُمْ أَزْوَاجًا
                     لِتَسْكُنُوا إِلَيْهَا
@@ -407,7 +503,7 @@ section[class^="inv-"]{padding:90px 0}
 
                 <p class="inv-section-title fade-up">Our Journey Begins</p>
 
-                <h2 class="inv-prewed-title fade-up">Together Forever</h2>
+                <h2 class="inv-prewed-title fade-up fx-zoom">Together Forever</h2>
 
                 <p class="inv-text fade-up">
                     Every love story is beautiful,
@@ -438,7 +534,7 @@ section[class^="inv-"]{padding:90px 0}
         <section class="inv-groom">
             <div class="inv-container">
 
-                <div class="inv-profile fade-up">
+                <div class="inv-profile fade-up fx-left">
 
                     <div class="inv-photo-frame">
                         <img src="images/groom.jpg" alt="Rey Mboyong, S.H" class="inv-photo">
@@ -485,7 +581,7 @@ section[class^="inv-"]{padding:90px 0}
         <section class="inv-bride">
             <div class="inv-container">
 
-                <div class="inv-profile inv-profile-reverse fade-up">
+                <div class="inv-profile inv-profile-reverse fade-up fx-right">
 
                     <div class="inv-photo-frame">
                         <img src="images/bride.jpg" alt="Dinda Hai, S.Gz" class="inv-photo">
@@ -604,7 +700,7 @@ section[class^="inv-"]{padding:90px 0}
         <section class="inv-event">
             <div class="inv-container">
 
-                <div class="inv-event-card fade-up">
+                <div class="inv-event-card fade-up fx-zoom">
 
                     <h2 class="inv-event-title">Akad Nikah</h2>
 
@@ -629,7 +725,7 @@ section[class^="inv-"]{padding:90px 0}
         <section class="inv-event">
             <div class="inv-container">
 
-                <div class="inv-event-card fade-up">
+                <div class="inv-event-card fade-up fx-zoom">
 
                     <h2 class="inv-event-title">Resepsi</h2>
 
@@ -714,6 +810,13 @@ section[class^="inv-"]{padding:90px 0}
                             <img id="qrImage" alt="QR Code Tamu">
                         </div>
 
+                    </div>
+
+                    <div class="ticket-actions">
+                        <button id="downloadQR" class="dl-btn" type="button">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download QR Code</span>
+                        </button>
                     </div>
 
                 </div>
@@ -830,6 +933,8 @@ section[class^="inv-"]{padding:90px 0}
         <!-- ================= PENUTUP ================= -->
         <section class="inv-footer">
 
+            <svg class="foot-gun" viewBox="0 0 200 310" aria-hidden="true"><use href="#gun"/></svg>
+
             <div class="inv-container">
 
                 <h2 class="inv-footer-title fade-up">Terima Kasih</h2>
@@ -843,11 +948,11 @@ section[class^="inv-"]{padding:90px 0}
                     untuk memberikan doa restu.
                 </p>
 
-                <h2 class="inv-title fade-up">Rey Mboyong, S.H</h2>
+                <h2 class="inv-title fade-up fx-left">Rey Mboyong, S.H</h2>
 
-                <div class="inv-and fade-up">&</div>
+                <div class="inv-and fade-up fx-zoom">&</div>
 
-                <h2 class="inv-title fade-up">Dinda Hai, S.Gz</h2>
+                <h2 class="inv-title fade-up fx-right">Dinda Hai, S.Gz</h2>
 
             </div>
 
@@ -886,21 +991,9 @@ section[class^="inv-"]{padding:90px 0}
             }
 
             const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-
-            const h = Math.floor(
-                (distance % (1000 * 60 * 60 * 24)) /
-                (1000 * 60 * 60)
-            );
-
-            const m = Math.floor(
-                (distance % (1000 * 60 * 60)) /
-                (1000 * 60)
-            );
-
-            const s = Math.floor(
-                (distance % (1000 * 60)) /
-                1000
-            );
+            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((distance % (1000 * 60)) / 1000);
 
             day.textContent = String(d).padStart(2, "0");
             hour.textContent = String(h).padStart(2, "0");
@@ -913,18 +1006,13 @@ section[class^="inv-"]{padding:90px 0}
 
         updateCountdown();
 
-        
-
         // =======================================
         // COPY REKENING
         // =======================================
 
         function copyRekening(id){
 
-            const nomor = document
-                .getElementById(id)
-                .innerText
-                .trim();
+            const nomor = document.getElementById(id).innerText.trim();
 
             navigator.clipboard.writeText(nomor);
 
@@ -932,11 +1020,7 @@ section[class^="inv-"]{padding:90px 0}
 
             toast.classList.add("show");
 
-            setTimeout(()=>{
-
-                toast.classList.remove("show");
-
-            },2500);
+            setTimeout(()=>{ toast.classList.remove("show"); },2500);
 
         }
 
@@ -944,45 +1028,51 @@ section[class^="inv-"]{padding:90px 0}
 
         const WEBAPP = "https://script.google.com/macros/s/AKfycbwfz-rbBxKY-uPOkTvTCl7lLLIemCh-_eqSfP4oXADE18s1CpjfpPqbeTZX6rJk5Pjwag/exec";
 
+        // Data tamu aktif (dipakai tombol Download QR)
+        window.currentGuest = null;
+
         async function loadTicket() {
 
             const slug = params.get("to");
 
             if (!slug) return;
 
-            const res = await fetch(
-                `${WEBAPP}?action=ticket&to=${encodeURIComponent(slug)}`
-            );
+            try {
 
-            const data = await res.json();
+                const res = await fetch(`${WEBAPP}?action=ticket&to=${encodeURIComponent(slug)}`);
 
-            console.log(data);
+                const data = await res.json();
 
-            if (!data.status) return;
+                console.log(data);
 
-            document.getElementById("ticket").style.display = "block";
+                if (!data.status) return;
 
-            document.getElementById("ticketguestName").innerText = data.name;
+                document.getElementById("ticket").style.display = "block";
+                document.getElementById("ticketguestName").innerText = data.name;
+                document.getElementById("guestStatus").innerText = data.checkin_status || "Belum Hadir";
+                document.getElementById("guestTime").innerText = data.checkin_time || "-";
+                document.getElementById("qrImage").src = data.qr_image;
 
-            document.getElementById("guestStatus").innerText = data.checkin_status || "Belum Hadir";
+                // kode QR: dari respons, atau dibaca dari parameter "text" pada URL gambar QR
+                let code = data.qr || data.code || "";
+                if (!code) {
+                    try { code = new URL(data.qr_image).searchParams.get("text") || ""; } catch (e) {}
+                }
 
-            document.getElementById("guestTime").innerText = data.checkin_time || "-";
+                window.currentGuest = { name: data.name, qr: data.qr_image, code: code };
 
-            document.getElementById("qrImage").src = data.qr_image;
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         //====================================
         // GOOGLE CALENDAR
         //====================================
 
-        const eventTitle =
-        "Wedding Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
-
-        const eventLocation =
-        "Gedung Serbaguna Anggun, Surabaya";
-
-        const eventDescription =
-        "Undangan Pernikahan Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
+        const eventTitle = "Wedding Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
+        const eventLocation = "Gedung Serbaguna Anggun, Surabaya";
+        const eventDescription = "Undangan Pernikahan Anggara Wisnu Wardhana & Tsamara Alifia Ramadhani";
 
         // Tahun, Bulan(0-11), Tanggal, Jam, Menit
         const eventStart = new Date(2027,0,1,10,0,0);
@@ -990,10 +1080,7 @@ section[class^="inv-"]{padding:90px 0}
 
         function googleDate(date){
 
-            return date
-            .toISOString()
-            .replace(/[-:]/g,"")
-            .replace(/\.\d{3}/,"");
+            return date.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
 
         }
 
@@ -1004,9 +1091,7 @@ section[class^="inv-"]{padding:90px 0}
         "&details="+encodeURIComponent(eventDescription)+
         "&location="+encodeURIComponent(eventLocation);
 
-        document
-        .getElementById("googleCalendarBtn")
-        .href = calendarUrl;
+        document.getElementById("googleCalendarBtn").href = calendarUrl;
 
         </script>
 
@@ -1061,12 +1146,12 @@ section[class^="inv-"]{padding:90px 0}
 
         cover.classList.add("hide");
 
-        setTimeout(()=>{
-            cover.style.display = "none";
-            invitation.style.display = "block";
-            requestAnimationFrame(()=>invitation.classList.add("show"));
-            window.scrollTo(0,0);
-        },800);
+        // undangan sudah tampil di belakang saat gunungan terbelah
+        invitation.style.display = "block";
+        requestAnimationFrame(()=>invitation.classList.add("show"));
+        window.scrollTo(0,0);
+
+        setTimeout(()=>{ cover.style.display = "none"; },1900);
     }
 
     btn.addEventListener("click", openInvitation);
@@ -1099,25 +1184,250 @@ section[class^="inv-"]{padding:90px 0}
     };
 
     // ======================================
-    // ANIMASI MUNCUL SAAT SCROLL (.fade-up)
+    // ANIMASI MUNCUL SAAT SCROLL (.fade-up) + jeda berurutan
     // ======================================
+    document.querySelectorAll(".inv-gallery-item").forEach((el,i)=>{
+        el.classList.add("fade-up", i % 2 ? "fx-right" : "fx-left");
+    });
+
     const items = document.querySelectorAll(".fade-up");
 
     if (!("IntersectionObserver" in window)) {
         items.forEach(el => el.classList.add("visible"));
-        return;
+    } else {
+        const io = new IntersectionObserver((entries)=>{
+            let n = 0;
+            entries.forEach(e=>{
+                if (e.isIntersecting) {
+                    e.target.style.transitionDelay = Math.min(n++,5)*0.12 + "s";
+                    e.target.classList.add("visible");
+                    io.unobserve(e.target);
+                }
+            });
+        },{threshold:.12});
+        items.forEach(el => io.observe(el));
     }
 
-    const io = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-            if (e.isIntersecting) {
-                e.target.classList.add("visible");
-                io.unobserve(e.target);
-            }
+    // ======================================
+    // PERCIKAN API BLENCONG (canvas)
+    // ======================================
+    const cv = document.getElementById("embers");
+    if (cv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const ctx = cv.getContext("2d");
+        let W, H, list = [];
+        const make = (init)=>({
+            x: Math.random()*W, y: init ? Math.random()*H : H + 10,
+            r: Math.random()*1.7 + .5, s: Math.random()*.45 + .15,
+            a: Math.random()*Math.PI*2, w: Math.random()*.02 + .006,
+            o: Math.random()*.5 + .3
         });
-    },{threshold:.12});
+        function size(){
+            W = cv.width = innerWidth; H = cv.height = innerHeight;
+            list = Array.from({length: W < 600 ? 28 : 52}, ()=>make(true));
+        }
+        size();
+        window.addEventListener("resize", size);
+        (function draw(){
+            ctx.clearRect(0,0,W,H);
+            list.forEach((p,i)=>{
+                p.y -= p.s; p.a += p.w; p.x += Math.sin(p.a)*.35;
+                if (p.y < -10) list[i] = make(false);
+                const tw = .55 + .45*Math.sin(p.a*3);
+                ctx.beginPath();
+                ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                ctx.fillStyle = `rgba(240,205,130,${p.o*tw})`;
+                ctx.shadowColor = "rgba(230,170,80,.9)";
+                ctx.shadowBlur = 9;
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        })();
+    }
 
-    items.forEach(el => io.observe(el));
+    // ======================================
+    // DOWNLOAD QR CODE TAMU
+    // Kartu yang sama dengan "QR ZIP" di admin (export.js)
+    // ======================================
+    function loadImage(url, timeout){
+        return new Promise((resolve, reject)=>{
+            const img = new Image();
+            const t = setTimeout(()=>reject(new Error("timeout")), timeout || 12000);
+            img.crossOrigin = "Anonymous";
+            img.onload = ()=>{ clearTimeout(t); resolve(img); };
+            img.onerror = ()=>{ clearTimeout(t); reject(new Error("gagal dimuat")); };
+            img.src = url;
+        });
+    }
+
+    async function loadQRImage(g){
+        // 1) gambar QR yang dipakai tiket   2) cadangan: quickchart dari kode (sama seperti admin)
+        try { return await loadImage(g.qr); } catch (e) {}
+        if (!g.code) throw new Error("QR tidak tersedia");
+        return await loadImage("https://quickchart.io/qr?size=800&margin=1&text=" + encodeURIComponent(g.code));
+    }
+
+    function roundRect(ctx,x,y,w,h,r){
+        ctx.beginPath();
+        ctx.moveTo(x+r,y);
+        ctx.arcTo(x+w,y,x+w,y+h,r);
+        ctx.arcTo(x+w,y+h,x,y+h,r);
+        ctx.arcTo(x,y+h,x,y,r);
+        ctx.arcTo(x,y,x+w,y,r);
+        ctx.closePath();
+    }
+
+    async function createGuestCard(guest){
+
+        try {
+            await Promise.all([
+                document.fonts.load('84px "Great Vibes"'),
+                document.fonts.load('700 60px "Cormorant Garamond"'),
+                document.fonts.load('40px "Jost"')
+            ]);
+        } catch (e) {}
+
+        const qrImage = await loadQRImage(guest);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 1000;
+        canvas.height = 1200;
+
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        // Background
+        ctx.fillStyle = "#fbfcfa";
+        ctx.fillRect(0,0,1000,1200);
+
+        // Header hijau
+        const g = ctx.createLinearGradient(0,0,1000,230);
+        g.addColorStop(0,"#14261f");
+        g.addColorStop(1,"#2b4d3d");
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,1000,230);
+
+        ctx.fillStyle = "#c9a15b";
+        ctx.fillRect(0,230,1000,6);
+
+        // Border emas ganda
+        ctx.strokeStyle = "#c9a15b";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(28,28,944,1144);
+
+        ctx.strokeStyle = "#e6cf9f";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(44,44,912,1112);
+
+        ctx.textAlign = "center";
+
+        // Judul
+        ctx.fillStyle = "#e6cf9f";
+        ctx.font = '26px "Jost",Arial,sans-serif';
+        ctx.fillText("E - T I C K E T",500,98);
+
+        ctx.font = '86px "Great Vibes","Brush Script MT",cursive';
+        ctx.fillText("Wedding Invitation",500,190);
+
+        // Bingkai QR
+        ctx.fillStyle = "#ffffff";
+        roundRect(ctx,190,290,620,620,22);
+        ctx.fill();
+
+        ctx.strokeStyle = "#c9a15b";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.drawImage(qrImage,220,320,560,560);
+
+        // Nama tamu (otomatis mengecil agar muat)
+        let name = String(guest.name || "");
+        let size = 64;
+
+        ctx.fillStyle = "#1f3a2e";
+        ctx.font = `700 ${size}px "Cormorant Garamond",Georgia,serif`;
+
+        while (ctx.measureText(name).width > 800 && size > 36) {
+            size -= 2;
+            ctx.font = `700 ${size}px "Cormorant Garamond",Georgia,serif`;
+        }
+
+        while (ctx.measureText(name).width > 800 && name.length > 3) {
+            name = name.slice(0,-1);
+        }
+
+        if (name !== String(guest.name || "")) name = name.trim() + "...";
+
+        ctx.fillText(name,500,985);
+
+        // Kode tamu
+        const code = String(guest.code || "").toUpperCase();
+
+        if (code) {
+            ctx.font = '500 40px "Jost",Arial,sans-serif';
+
+            const cw = Math.min(ctx.measureText(code).width + 80, 860);
+
+            ctx.fillStyle = "#f7f0e0";
+            roundRect(ctx,500-cw/2,1012,cw,66,33);
+            ctx.fill();
+
+            ctx.fillStyle = "#1f3a2e";
+            ctx.fillText(code,500,1058);
+        }
+
+        // Keterangan & footer
+        ctx.fillStyle = "#6a796d";
+        ctx.font = '26px "Jost",Arial,sans-serif';
+        ctx.fillText("Tunjukkan QR Code ini kepada petugas",500,1114);
+
+        ctx.fillStyle = "#c9a15b";
+        ctx.font = '24px "Jost",Arial,sans-serif';
+        ctx.fillText("Powered by DJATI Restu",500,1146);
+
+        return canvas;
+    }
+
+    async function downloadQR(){
+
+        const g = window.currentGuest;
+        if (!g || !g.qr) return;
+
+        const button = document.getElementById("downloadQR");
+        const label = button.querySelector("span");
+        button.disabled = true;
+        label.textContent = "Menyiapkan...";
+
+        try {
+
+            const canvas = await createGuestCard(g);
+
+            const blob = await new Promise((resolve,reject)=>
+                canvas.toBlob(b => b ? resolve(b) : reject(new Error("canvas kosong")), "image/png", 1)
+            );
+
+            const safe = String(g.name || "tamu").replace(/[\\/:*?"<>|]/g,"").replace(/\s+/g," ").trim() || "tamu";
+            const prefix = g.code ? String(g.code).toUpperCase() + " - " : "QR - ";
+
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = prefix + safe + ".png";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+
+        } catch (err) {
+            console.error(err);
+            // cadangan: buka gambar QR asli bila canvas diblokir
+            window.open(g.qr, "_blank");
+        }
+
+        button.disabled = false;
+        label.textContent = "Download QR Code";
+    }
+
+    document.getElementById("downloadQR").addEventListener("click", downloadQR);
 
 })();
 </script>
