@@ -582,6 +582,7 @@ function loadCardFonts(){
         cardFontsReady = Promise.all([
             document.fonts.load('84px "Great Vibes"'),
             document.fonts.load('700 60px "Cormorant Garamond"'),
+            document.fonts.load('italic 600 36px "Cormorant Garamond"'),
             document.fonts.load('40px "Jost"')
         ]).catch(()=>{});
 
@@ -643,7 +644,7 @@ async function createGuestCard(guest){
     const canvas = document.createElement("canvas");
 
     canvas.width = 1000;
-    canvas.height = 1200;
+    canvas.height = 1260;
 
     const ctx = canvas.getContext("2d");
 
@@ -652,7 +653,7 @@ async function createGuestCard(guest){
 
     // Background
     ctx.fillStyle = "#fbfcfa";
-    ctx.fillRect(0,0,1000,1200);
+    ctx.fillRect(0,0,1000,1260);
 
     // Header hijau
     const g = ctx.createLinearGradient(0,0,1000,230);
@@ -668,11 +669,11 @@ async function createGuestCard(guest){
     // Border emas ganda
     ctx.strokeStyle = "#c9a15b";
     ctx.lineWidth = 6;
-    ctx.strokeRect(28,28,944,1144);
+    ctx.strokeRect(28,28,944,1204);
 
     ctx.strokeStyle = "#e6cf9f";
     ctx.lineWidth = 2;
-    ctx.strokeRect(44,44,912,1112);
+    ctx.strokeRect(44,44,912,1172);
 
     ctx.textAlign = "center";
 
@@ -721,28 +722,49 @@ async function createGuestCard(guest){
 
     ctx.fillText(name,500,985);
 
-    // Kode tamu
-    const code = String(guest.qr || "").toUpperCase();
+    // Teks pasangan (menggantikan kode tamu, mis. GUEST-001)
+    ctx.strokeStyle = "#c9a15b";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(380,1018); ctx.lineTo(486,1018);
+    ctx.moveTo(514,1018); ctx.lineTo(620,1018);
+    ctx.stroke();
 
-    ctx.font = '500 40px "Jost",Arial,sans-serif';
+    ctx.fillStyle = "#c9a15b";
+    ctx.save();
+    ctx.translate(500,1018);
+    ctx.rotate(Math.PI/4);
+    ctx.fillRect(-6,-6,12,12);
+    ctx.restore();
 
-    const cw = Math.min(ctx.measureText(code).width+80,860);
+    ctx.fillStyle = "#c9a15b";
+    ctx.font = '46px "Great Vibes","Brush Script MT",cursive';
+    ctx.fillText("Wedding of",500,1074);
 
-    ctx.fillStyle = "#f7f0e0";
-    roundRect(ctx,500-cw/2,1012,cw,66,33);
-    ctx.fill();
+    const couple = "Rey Mboyong, S.H dan Dinda Hai, S.Gz";
+    let cs = 36;
 
     ctx.fillStyle = "#1f3a2e";
-    ctx.fillText(code,500,1058);
+    ctx.font = `italic 600 ${cs}px "Cormorant Garamond",Georgia,serif`;
+
+    while(ctx.measureText(couple).width>820 && cs>22){
+
+        cs -= 2;
+
+        ctx.font = `italic 600 ${cs}px "Cormorant Garamond",Georgia,serif`;
+
+    }
+
+    ctx.fillText(couple,500,1120);
 
     // Keterangan & footer
     ctx.fillStyle = "#6a796d";
-    ctx.font = '26px "Jost",Arial,sans-serif';
-    ctx.fillText("Tunjukkan QR Code ini kepada petugas",500,1114);
+    ctx.font = '24px "Jost",Arial,sans-serif';
+    ctx.fillText("Tunjukkan QR Code ini kepada petugas",500,1168);
 
     ctx.fillStyle = "#c9a15b";
-    ctx.font = '24px "Jost",Arial,sans-serif';
-    ctx.fillText("Powered by DJATI Restu",500,1146);
+    ctx.font = '22px "Jost",Arial,sans-serif';
+    ctx.fillText("Powered by DJATI Restu",500,1204);
 
     return canvas;
 
